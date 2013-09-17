@@ -1,0 +1,125 @@
+//http://www.dwepe.com/vljacobs/code/source/gingerbread.cpp
+//http://www.de-brauwer.be/wiki/wikka.php?wakka=PyOpenGLGingerbread
+
+// Angel.h is homegrown include file that also includes glew and freeglut
+
+#include "Angel.h"
+#include "mat.h"
+
+#include <math.h>
+#include <iostream>
+#include <fstream>
+using namespace std;
+
+
+void myInit(void){
+
+  // set background color to black	
+  glClearColor(0.0, 0.0, 0.0, 0.0);  
+  
+  // set point size for "clearer" image
+  glPointSize(1.0);
+  
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  
+  // set 2D coordinate system
+  // set so entire fractal is shown
+  gluOrtho2D(-350.0, 450.0, -650.0, 50.0);
+
+}
+
+void display(void){
+    
+  // values used in fractal algorithm
+  // next values are a function of prev values
+  int nextX, nextY;
+    
+  // these values are suggested in the Hill, Computer Graphics Book, pg. 72
+  int prevX = 115;
+  int prevY = 121;
+  
+  // also suggested values from book
+  int M = 40;
+  int L = 3;	
+   
+  // store random number to use for random colors of points
+  float randomNum;
+  
+  // clear to background color
+  glClear(GL_COLOR_BUFFER_BIT);
+  
+  // set color of points, will be changed for each one so initial 
+  // color is arbitrary here
+  glColor3ub(100, 100, 100);
+
+  // rotate axis so that fractal is vertical
+  glRotatef(-135, 0, 0, 1);
+  
+  // start drawing fractal
+  glBegin(GL_POINTS);	  
+
+    // "Gingerbread Man" algorithm
+    // q.x = M(1 + 2L) - p.y + |p.x - LM|
+    // q.y = p.x
+    // where p is previous point, and q is the current point
+    // L and M are constants for scaling and positioning
+  
+    // draw entire algorithm with 15 different starting points for better image
+    for(int i = 0; i < 15; i++){
+    
+      // draw large number of dots for fractal 
+	  for(int j = 0; j < 50000; j++){
+		
+		// calculate next points to plot  
+        nextX = ( (M*(1+2*L)) - prevY + (abs(prevX - (L*M)))  );
+        nextY = prevX;
+
+		// plot current point
+		glVertex2i(prevX, prevY);
+        
+		// set current point as old point
+		prevX = nextX;
+        prevY = nextY;
+
+        // generate a random number between 0 and 1
+        randomNum = (float) rand() / RAND_MAX ;
+     
+        // set color randomly for next point
+	    glColor3ub( 255*randomNum, (17*i)/randomNum , 255 - 17*i);
+	  }
+	
+      // increment last point drawn on fractal to act as a new starting point
+	  prevX = prevX + 2;
+      prevY = prevY + 3;
+    }
+  
+  // end drawing fractal
+  glEnd();	  
+ 
+  // send fractal to the display
+  glFlush();
+}
+
+
+int main(int argc, char **argv){
+
+  // initialize window using glut
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+  
+  
+  glutInitWindowSize(800, 700);
+  glutInitWindowPosition(50, 50);
+  glutCreateWindow("Gingerbread man");
+
+  // data to draw
+  glutDisplayFunc(display);
+  
+  // initialize display specifics
+  myInit();
+  
+  glutMainLoop(); 
+
+  return 0;            
+}
