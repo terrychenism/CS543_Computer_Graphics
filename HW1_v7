@@ -1,0 +1,333 @@
+// Starter program for HW 0. 
+// Program draws a triangle. Study the program first
+// Then modify the function generateGeometry to draw a two-Dimensional Sierpinski Gasket       
+// Generated using randomly selected vertices and bisection
+
+// Angel.h is homegrown include file that also includes glew and freeglut
+
+#include "Angel.h"
+
+
+
+//----------------------------------------------------------------------------
+
+// remember to prototype
+//void generateGeometry( void );
+void initGPUBuffers( void );
+void shaderSetup( void );
+void display( void );
+void keyboard( unsigned char key, int x, int y );
+
+typedef vec2 point2;
+
+using namespace std;
+const int screenWidth = 640;
+const int screenHeight = 480;
+
+// Array for polyline
+point2 points[2999];
+GLuint program;
+GLuint buffer;
+struct GLintPoint{
+	GLint x,y;
+};
+
+
+//void generateGeometry( void )
+//{
+//		// ***************** Important note ***************** //
+//	// please refer to OpenGL documentation before coding
+//	// many old functions have been depricated
+//	// though they will probably still work on most machines others
+//	// will require compatiability mode to be used
+//
+//	// Specifiy the vertices for a triangle
+//	// for 3d points use vec3 and change your vPosition attribute appropriately
+//
+//	points[0] = point2( -0.5, -0.5 );
+//	points[1] = point2( 0.0, 0.5 );
+//	points[2] = point2( 0.5, -0.5 );
+//}
+
+
+void initGPUBuffers( void )
+{
+	    // Create a vertex array object
+    GLuint vao;
+    glGenVertexArrays( 1, &vao );
+    glBindVertexArray( vao );
+
+    // Create and initialize a buffer object
+    //GLuint buffer;
+    glGenBuffers( 1, &buffer );
+    glBindBuffer( GL_ARRAY_BUFFER, buffer );
+    glBufferData( GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW );
+
+
+}
+
+
+void shaderSetup( void )
+{
+	    // Load shaders and use the resulting shader program
+    program = InitShader( "vshader1.glsl", "fshader1.glsl" );
+    glUseProgram( program );
+
+    // Initialize the vertex position attribute from the vertex shader
+    GLuint loc = glGetAttribLocation( program, "vPosition" );
+    glEnableVertexAttribArray( loc );
+    glVertexAttribPointer( loc, 2, GL_FLOAT, GL_FALSE, 0,
+                           BUFFER_OFFSET(0) );
+
+	// sets the default color to clear screen
+    glClearColor( 1.0, 1.0, 1.0, 1.0 ); // white background
+
+}
+//--------------------------------------------------
+
+
+
+void setWindow(GLdouble left,GLdouble right,GLdouble bottom,GLdouble top)
+{   
+	mat4 ortho = Ortho2D( left,right,bottom,top );
+	GLint ProjLoc = glGetUniformLocation( program, "Proj" );
+	glUniformMatrix4fv( ProjLoc, 1, GL_FALSE, ortho );
+}
+
+
+//------------------------------------------------------
+void drawPolylineFile(char *FileName)
+{
+	
+	char line[256];
+	float left, right, bottom, top;
+	FILE *inStream;
+	GLint numpolys, numLines; 
+	GLfloat	x, y;
+	int NumPoints;
+
+	if((inStream = fopen(FileName, "rt")) == NULL) // Open The File
+	{
+		printf("File does not exist!");
+		exit(0);
+	}
+
+	//Deal with dino.dat file
+	if(strcmp(FileName,"dino.dat")==0)
+	{
+		left = 0;
+		right = 640;
+		bottom = 0;
+		top = 480;
+	}
+	else 
+	{
+		while(!feof(inStream))
+		{
+			//Just go through comments
+			memset(line, 0, 256);
+			fscanf(inStream, "%s", line);
+			if(line[0] == '*')
+				break;
+			else
+				continue;
+		}
+		// read in the four directions of extents
+		fscanf(inStream, "%f %f %f %f\n", &left, &top, &right, &bottom);
+	 }
+	
+
+	fscanf(inStream,"%d", &numpolys);			// read the number of polylines
+	for(int j = 0; j < numpolys; j++)
+	{	//read each polyline
+		
+		fscanf(inStream,"%d", &numLines);
+		for (int i = 0; i < numLines; i++)
+		{
+			fscanf(inStream,"%f %f", &x, &y);
+			points[i] = point2( x , y);
+		}
+		NumPoints = numLines;
+		setWindow(left, right, bottom,top);
+		glBufferData( GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW );
+		glDrawArrays( GL_LINE_STRIP, 0, NumPoints ); 
+		glFlush();
+	}
+
+	fclose(inStream);
+}
+
+//--------------------------------------------------------------------------
+//draw house
+
+
+void hardwiredHouse(void)
+{
+glBegin(GL_LINE_LOOP);
+glVertex2i(40, 40); // draw the shell of house
+glVertex2i(40, 90);
+glVertex2i(70, 120);
+glVertex2i(100, 90);
+glVertex2i(100, 40);
+glEnd();
+glBegin(GL_LINE_STRIP);
+glVertex2i(50, 100); // draw the chimney
+glVertex2i(50, 120);
+glVertex2i(60, 120);
+glVertex2i(60, 110);
+glEnd();
+// draw the door
+// draw the window
+}
+//void myMovedMouse(GLint x, GLint y)
+//{
+//CP.x = x; CP.y = y; // update the CP
+//}
+
+//----------------------------------------------------------------------------
+// this is where the drawing should happen
+void display( void )
+{
+	
+
+    glClear( GL_COLOR_BUFFER_BIT );     // clear the window
+	glViewport(0, 432, 64, 48);
+	drawPolylineFile("dino.dat");
+	glViewport(64, 432, 64, 48);
+	drawPolylineFile("birdhead.dat");
+	glViewport(64*2, 432, 64, 48);
+	drawPolylineFile("dragon.dat");
+	glViewport(64*3, 432, 64, 48);
+	drawPolylineFile("house.dat");
+	glViewport(64*4, 432, 64, 48);
+	drawPolylineFile("knight.dat");
+	glViewport(64*5, 432, 64, 48);
+	drawPolylineFile("rex.dat");
+	glViewport(64*6, 432, 64, 48);
+	drawPolylineFile("scene.dat");
+	glViewport(64*7, 432, 64, 48);
+	drawPolylineFile("usa.dat");
+	glViewport(64*8, 432, 64, 48);
+	drawPolylineFile("vinci.dat");
+	glViewport(64*9, 432, 64, 48);
+	drawPolylineFile("vinci.dat");
+	
+    glFlush(); // force output to graphics hardware
+
+}
+
+
+//----------------------------------------------------------------------------
+// mouse handler
+
+
+void myMouse(int button, int state, int x, int y)
+{
+	static GLintPoint corner[1];
+static int numCorners = 0; // initial value is 0
+if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+{
+corner[numCorners].x = x;
+corner[numCorners].y = screenHeight - y; //flip y coord
+
+// draw .dat or do whatever you planned to do
+	if((corner[numCorners].x<=64)&&(corner[numCorners].x>=0)){
+		glViewport(0, 0, 640, 432);
+		drawPolylineFile("dino.dat");
+	}
+	else if (corner[numCorners].x<=64*2&&corner[numCorners].x>64){
+	glViewport(0, 0, 640, 432);
+	drawPolylineFile("birdhead.dat");
+	}
+	else if(corner[numCorners].x<=64*3&&corner[numCorners].x>64*2){
+		glViewport(0, 0, 640, 432);
+		drawPolylineFile("dragon.dat");
+	}
+	else if(corner[numCorners].x<=64*4&&corner[numCorners].x>64*3){
+		glViewport(0, 0, 640, 432);
+		drawPolylineFile("house.dat");
+	}
+	else if(corner[numCorners].x<=64*5&&corner[numCorners].x>64*4){
+		glViewport(0, 0, 640, 432);
+		drawPolylineFile("knight.dat");
+	}
+	else if(corner[numCorners].x<=64*6&&corner[numCorners].x>64*5){
+		glViewport(0, 0, 640, 432);
+		drawPolylineFile("rex.dat");
+	}
+	else if(corner[numCorners].x<=64*7&&corner[numCorners].x>64*6){
+		glViewport(0, 0, 640, 432);
+		drawPolylineFile("scene.dat");
+	}
+	else if(corner[numCorners].x<=64*8&&corner[numCorners].x>64*7){
+		glViewport(0, 0, 640, 432);
+		drawPolylineFile("usa.dat");
+	}
+	else {
+		glViewport(0, 0, 640, 432);
+		drawPolylineFile("vinci.dat");
+	}
+numCorners == 0;
+}
+//else if(button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+//glClear(GL_COLOR_BUFFER_BIT); // clear the window
+glFlush( );
+}
+
+
+//----------------------------------------------------------------------------
+// keyboard handler
+void keyboard( unsigned char key, int x, int y )
+{
+    switch ( key ) {
+    case 033:
+        exit( EXIT_SUCCESS );
+        break;
+	/*case 'p':
+		glViewport(0, 0, 640, 432);
+		drawPolylineFile("dino.dat");
+		break;*/
+	case 'k':
+		hardwiredHouse();
+		break;
+    }
+}
+
+//----------------------------------------------------------------------------
+// entry point
+int main( int argc, char **argv )
+{
+	// init glut
+    glutInit( &argc, argv );
+    glutInitDisplayMode( GLUT_RGBA | GLUT_SINGLE );
+    glutInitWindowSize( 640, 480 );
+
+    // If you are using freeglut, the next two lines will check if 
+    // the code is truly 3.2. Otherwise, comment them out
+    
+    //glutInitContextVersion( 3, 3 );
+    //glutInitContextProfile( GLUT_CORE_PROFILE );
+
+	// create GLUT window for drawing
+    glutCreateWindow( "Starting App" );
+
+	// init glew
+    glewInit();
+
+    //generateGeometry( );
+    initGPUBuffers( );
+    shaderSetup( );
+
+	// assign handlers
+    glutDisplayFunc( display );
+    glutKeyboardFunc( keyboard );
+	// should add menus
+	// add mouse handler
+	glutMouseFunc(myMouse);
+	// add resize window functionality (should probably try to preserve aspect ratio)
+
+	// enter the drawing loop
+	// frame rate can be controlled with 
+    glutMainLoop();
+    return 0;
+}
