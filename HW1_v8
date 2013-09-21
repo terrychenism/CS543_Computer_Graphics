@@ -34,7 +34,7 @@ struct GLintPoint{
 int corner_x=0;
 int corner_y=432;
 
-//void generateGeometry( void )
+//void generateGeometry( void ) 
 //{
 //		// ***************** Important note ***************** //
 //	// please refer to OpenGL documentation before coding
