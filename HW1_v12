@@ -214,7 +214,7 @@ void keyboard( unsigned char key, int x, int y )
 	case 'g':
 		keyboard_value='g';
 		//glClear(GL_COLOR_BUFFER_BIT);
-		//glViewport(0, 0, 640, 480);
+		glViewport(0, 0, 640, 480);
 		drawGingerman();
 		//display();
 		
@@ -242,6 +242,7 @@ void myMouse(int button, int state, int x, int y)
 {
 static GLintPoint corner[2];
 static int numCorners = 0; // initial value is 0
+int pointnum; 
 switch(keyboard_value){
 case'p':
 	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
@@ -253,22 +254,23 @@ case'p':
 case't':
 
 	break;
-//case'e':
-//	if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
-//	{
-//	corner[numCorners].x = x;
-//	corner[numCorners].y = screenHeight - y; //flip y coord
-//	if(++numCorners == 1)
-//	{	
-//		glBegin(GL_LINE_LOOP);
-//		glVertex2i(corner[0].x,corner[0].y);//draw a line
-//		glVertex2i(corner[0].x,corner[1].y);
-//		glEnd();
-//	}
-//	
-//	}
-//	
-//	break;
+
+case'e':
+	for(int i=1;i<=100;i++){
+		if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+		{
+			corner_x = x;
+			corner_y= screenHeight - y; //flip y coord
+			
+			points[i]= point2( corner_x , corner_y);
+			pointnum = i;
+		}
+		setWindow(0, 640, 0,480);
+			glBufferData( GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW );
+			glDrawArrays( GL_POINTS, 0, pointnum ); 
+			glFlush();
+	}
+	break;
 }
 }
 
