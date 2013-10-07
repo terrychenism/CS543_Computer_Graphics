@@ -17,6 +17,7 @@ bool Zaction=true;
 bool zaction=true;
 bool rotateaction=true;
 bool scaleaction=true;
+bool normalaction=true;
 int numclick=0;
 
 float stepX=0,stepY=0,stepZ=0;
@@ -158,10 +159,10 @@ void colorcube()
 
 void drawnormal(){
 
-   /* GLuint buffer1;
+	GLuint buffer1;
     glGenBuffers( 1, &buffer1 );
-    glBindBuffer( GL_ARRAY_BUFFER, buffer1 );*/
-	glBindBuffer( GL_ARRAY_BUFFER, picture[numclick].m_VBO );
+    glBindBuffer( GL_ARRAY_BUFFER, buffer1 );
+	//glBindBuffer( GL_ARRAY_BUFFER, picture[numclick].m_VBO );
     glBufferData( GL_ARRAY_BUFFER, sizeof(float)*picture[numclick].numface*6, picture[numclick].Normals, GL_STATIC_DRAW );
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 	glEnable( GL_DEPTH_TEST );
@@ -249,9 +250,9 @@ void drawCube(void)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,  picture[numclick].n_IBO );
 	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
 	glEnableVertexAttribArray( vPosition );
-	glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,
+	glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,
 			   BUFFER_OFFSET(0) );	
-	glDrawElements(  GL_QUADS, 24, GL_UNSIGNED_INT,  0);
+	glDrawElements(  GL_QUADS, 24, GL_UNSIGNED_INT,  0);//violation
 	glDisable( GL_DEPTH_TEST ); 
 }
 
@@ -380,7 +381,10 @@ void display( void )
 
 	if(keyboard_value=='m')
 	{
+		if(!normalaction){
 		drawnormal();
+
+		}
 		cout<<"normal\n";
 	}
 	if(keyboard_value=='B')
@@ -468,6 +472,7 @@ void keyboard( unsigned char key, int x, int y )
 		break;
 	case 'm':
 		keyboard_value='m';
+		normalaction=!normalaction;
 		display();
 		break;
 	case 'e':
@@ -767,18 +772,6 @@ void ReadPlyFile(char *FileName,int i)
 						picture[i].Normals[iterator*6+3] = picture[i].Normals[iterator*6]+normals.x;	
 						picture[i].Normals[iterator*6+4] = picture[i].Normals[iterator*6+1]+normals.y;	
 						picture[i].Normals[iterator*6+5] = picture[i].Normals[iterator*6+2]+normals.z;
-
-
-							
-							/*picture[i].Vertex_Buffer[vertex1*3]=picture[i].Vertex_Buffer[vertex1*3]+stepN*normals.x;
-							picture[i].Vertex_Buffer[vertex2*3]=picture[i].Vertex_Buffer[vertex2*3]+stepN*normals.x;
-							picture[i].Vertex_Buffer[vertex2*3]=picture[i].Vertex_Buffer[vertex2*3]+stepN*normals.x;
-							picture[i].Vertex_Buffer[vertex1*3+1]=picture[i].Vertex_Buffer[vertex1*3+1]+stepN*normals.y;
-							picture[i].Vertex_Buffer[vertex2*3+1]=picture[i].Vertex_Buffer[vertex2*3+1]+stepN*normals.y;
-							picture[i].Vertex_Buffer[vertex3*3+1]=picture[i].Vertex_Buffer[vertex3*3+1]+stepN*normals.y;
-							picture[i].Vertex_Buffer[vertex1*3+2]=picture[i].Vertex_Buffer[vertex1*3+2]+stepN*normals.z;
-							picture[i].Vertex_Buffer[vertex2*3+2]=picture[i].Vertex_Buffer[vertex2*3+2]+stepN*normals.z;
-							picture[i].Vertex_Buffer[vertex3*3+2]=picture[i].Vertex_Buffer[vertex3*3+2]+stepN*normals.z;*/
 					
 
 					}				
