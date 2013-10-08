@@ -43,9 +43,7 @@ GLuint program;
 
 using namespace std;
 
-//const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
-//point4 points[NumVertices];
-//color4 colors[NumVertices];
+
 
 class vertexdata
 {
@@ -92,45 +90,11 @@ public:
 vertexdata picture[43];
 
 
-//// RGBA olors
-//color4 vertex_colors[8] = {
-//    color4( 0.0, 0.0, 0.0, 1.0 ),  // black
-//    color4( 1.0, 0.0, 0.0, 1.0 ),  // red
-//    color4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
-//    color4( 0.0, 1.0, 0.0, 1.0 ),  // green
-//    color4( 0.0, 0.0, 1.0, 1.0 ),  // blue
-//    color4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
-//    color4( 1.0, 1.0, 1.0, 1.0 ),  // white
-//    color4( 0.0, 1.0, 1.0, 1.0 )   // cyan
-//};
 
-//int Index = 0;
-//void quad( int a, int b, int c, int d )
-//{
-//	/*point4 vertices[8] = {
-//    point4( picture[numclick].xMIN, picture[numclick].yMIN,  picture[numclick].zMAX ,1.0),
-//    point4( picture[numclick].xMIN, picture[numclick].yMAX,  picture[numclick].zMAX ,1.0),
-//    point4(  picture[numclick].xMAX, picture[numclick].yMAX, picture[numclick].zMAX ,1.0),
-//    point4(  picture[numclick].xMAX, picture[numclick].yMIN, picture[numclick].zMAX ,1.0),
-//    point4( picture[numclick].xMIN, picture[numclick].yMIN,  picture[numclick].zMIN,1.0),
-//    point4( picture[numclick].xMIN,  picture[numclick].yMAX, picture[numclick].zMIN ,1.0),
-//    point4( picture[numclick].xMAX,  picture[numclick].yMAX, picture[numclick].zMIN ,1.0),
-//    point4(  picture[numclick].xMAX,  picture[numclick].yMIN, picture[numclick].zMIN ,1.0)
-//};*/
-//
-//	
-//}
 
 void colorcube()
 {
- //   quad( 1,5,6,2); 
-	//quad( 5,6,2,1);
-	//quad( 1,2,3,0); 
-	//quad( 2,3,0,1); 
-	//quad( 7,4,0,3);
-	//quad( 4,0,3,7); 
-	//quad( 5,4,7,6);
-	//quad( 4,7,6,5);
+
 
 	float boundpoints[24]={ picture[numclick].xMIN, picture[numclick].yMIN,  picture[numclick].zMAX ,
 						    picture[numclick].xMIN, picture[numclick].yMAX,  picture[numclick].zMAX ,
@@ -185,43 +149,10 @@ void drawnormal(){
 	 }	
 
 
-//void generateGeometry( void )
-//{	
-//    colorcube();
-//
-//    // Create a vertex array object
-//    GLuint vao;
-//    glGenVertexArrays( 1, &vao );
-//    glBindVertexArray( vao );
-//
-//    // Create and initialize a buffer object
-//    //GLuint buffer;
-//    //glGenBuffers( 1, &buffer );
-//    //glBindBuffer( GL_ARRAY_BUFFER, buffer );
-//	glGenBuffers( 1, &picture[numclick].n_VBO );
-//	glBindBuffer( GL_ARRAY_BUFFER, picture[numclick].n_VBO );
-//    glBufferData( GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors),
-//		  NULL, GL_STATIC_DRAW );
-//    glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(points), points );
-//    glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors );
-//
-//
-//	// Load shaders and use the resulting shader program
-//    program = InitShader( "vshader1.glsl", "fshader1.glsl" );
-//    glUseProgram( program );
-//     // set up vertex arrays
-//    GLuint vPosition = glGetAttribLocation( program, "vPosition" );
-//    glEnableVertexAttribArray( vPosition );
-//    glVertexAttribPointer( vPosition, 4, GL_FLOAT, GL_FALSE, 0,
-//			   BUFFER_OFFSET(0) );
-//
-//
-//    glClearColor(0.0, 0.0, 0.0, 1.0 ); // white background
-//}
+
 GLuint vao;
 void generateGeometry( void )
 {	
-	//colorcube();
 
 	// Load shaders and use the resulting shader program
     program = InitShader( "vshader1.glsl", "fshader1.glsl" );
@@ -229,13 +160,6 @@ void generateGeometry( void )
 
     glGenVertexArrays( 1, &vao );
     glBindVertexArray( vao );
-
-	//GLuint buffer;
- //   glGenBuffers( 1, &buffer );
- //   glBindBuffer( GL_ARRAY_BUFFER, buffer );
- //   glBufferData( GL_ARRAY_BUFFER, sizeof(picture[numclick].Points),
-	//	  picture[numclick].Points, GL_STATIC_DRAW );
-
 
      // set up vertex arrays
     GLuint vPosition = glGetAttribLocation( program, "vPosition" );
@@ -266,20 +190,6 @@ void drawCube(void)
 
 void drawpic(int i)
 {
-	//if(keyboard_value=='B'){
-	//for (int iterator = 0; iterator < picture[numclick].numvertex; iterator++){
-	//			//picture[numclick].Vertex_Buffer[iterator*3]   += picture[numclick].stepN*picture[numclick].vr[0];
-	//			//picture[numclick].Vertex_Buffer[iterator*3+1] += picture[numclick].stepN*picture[numclick].vr[1];
-	//			//picture[numclick].Vertex_Buffer[iterator*3+2] += picture[numclick].stepN*picture[numclick].vr[2];
-	//			picture[numclick].Vertex_Buffer[iterator*3]   += picture[numclick].vr[0]*0.001;
-	//			picture[numclick].Vertex_Buffer[iterator*3+1] += picture[numclick].vr[1]*0.001;
-	//			picture[numclick].Vertex_Buffer[iterator*3+2] += picture[numclick].vr[2]*0.001;
-	//		}
-	//}
-	//glDeleteBuffers( 1, &picture[i].m_VBO );
-	//glGenBuffers( 1, &picture[i].m_VBO );
-	//glBindBuffer( GL_ARRAY_BUFFER, picture[i].m_VBO );
-	//glBufferData( GL_ARRAY_BUFFER, sizeof(float)*picture[i].numvertex*3, picture[i].Vertex_Buffer, GL_STATIC_DRAW );
 
 
      //Create and initialize a buffer object
@@ -398,13 +308,7 @@ void display( void )
 		cout<<"normal\n";
 	}
 	if(keyboard_value=='B')
-	{
-		//if(!pulsingaction){
-			
-			//cout<<"pulsing \n";
-		//}
-		
-		
+	{	
 	}
 
     glFlush(); // force output to graphics hardware
@@ -723,7 +627,7 @@ void ReadPlyFile(char *FileName,int i)
 					picture[i].zMIN=picture[i].Vertex_Buffer[iterator*3+2];
 				}				
 			}
-			
+
 
 
 			Angel::mat4 modelMat = Angel::identity();
@@ -740,7 +644,12 @@ void ReadPlyFile(char *FileName,int i)
 		picture[i].Vertex_Buffer[iterator*3+1] = modelvertex.y;
 		picture[i].Vertex_Buffer[iterator*3+2] = modelvertex.z;
 	}
-
+		picture[i].xMAX=0;
+		picture[i].xMIN=0;
+		picture[i].yMAX=0;
+		picture[i].yMIN=0;
+		picture[i].zMAX=0;
+		picture[i].zMIN=0;
 		
 
 		for (int iterator = 0; iterator < picture[i].numvertex; iterator++)
@@ -765,7 +674,6 @@ void ReadPlyFile(char *FileName,int i)
 				}
 				
 			}
-
 
 
 			//printf("%f %f %f %f %f %f\n",picture[i].xMAX,picture[i].yMAX,picture[i].zMAX,picture[i].xMIN,picture[i].yMIN,picture[i].zMIN);
