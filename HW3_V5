@@ -317,14 +317,18 @@ void drawtree(int picnum)
 	glDisable( GL_DEPTH_TEST ); 
 }
 
+
+
 void display( void )
 {
-	
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
+	//Angel::mat4 mv = Angel::LookAt(vec4 eye, vec4 at, vec4 up); 
+	mat4 mv = LookAt( (0,0,200,1), (currentposition.x,currentposition.y,currentposition.z,1), (0,1,0,0) );
 
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
+	
 	for(int i = 0; i < element[Lsysnum].length; i++ )
 	{
-			Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)600.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
+			Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
 
 
 			float viewMatrixf[16];
@@ -341,11 +345,12 @@ void display( void )
 			Angel::mat4 modelMat = Angel::identity();
 			/*modelMat = modelMat *Angel::Translate(-(picture[numclick].xMAX + picture[numclick].xMIN)/2,-(picture[numclick].yMAX + picture[numclick].yMIN)/2,-(picture[numclick].zMAX + picture[numclick].zMIN)/2);
 			*/
+			modelMat = modelMat * mv;
 
 			ztrans = sqrt(pow(picture[numclick].xMAX-picture[numclick].xMIN,2)+pow(picture[numclick].yMAX-picture[numclick].yMIN,2)+pow(picture[numclick].zMAX-picture[numclick].zMIN,2));
-			modelMat = modelMat * Angel::Scale(1,1,1)* Angel::Translate(0,0,-ztrans )  *Angel::RotateY(picture[numclick].thetaY) * Angel::RotateY(0.0f) ;
+			modelMat = modelMat * Angel::Scale(1,1,1)* Angel::Translate(0,0,-ztrans )  *Angel::RotateY(picture[numclick].thetaY) * Angel::RotateX(0.0f) ;
 			modelMat = modelMat * Angel::Translate(stepX,stepY,stepZ);
-			modelMat = modelMat * Angel::Translate(picture[numclick].xMAX-pointodraw[i].x, picture[numclick].yMIN-pointodraw[i].y,(picture[numclick].zMAX-picture[numclick].yMIN)/2 -pointodraw[i].z);
+			modelMat = modelMat * Angel::Translate((picture[numclick].xMAX+picture[numclick].xMIN)/2+pointodraw[i].x, picture[numclick].yMIN+pointodraw[i].y,(picture[numclick].zMAX+picture[numclick].yMIN)/2 -pointodraw[i].z);
 			//modelMat = modelMat * Angel::Translate(0.0, 0.0, -2.0f) * Angel::RotateY(45.0f) * Angel::RotateX(35.0f);
 
 			float modelMatrixf[16];
@@ -367,7 +372,7 @@ void display( void )
 
 
 	
-			drawtree(0);
+			drawtree(1);
 	}
 
 
