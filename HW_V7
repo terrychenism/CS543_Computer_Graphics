@@ -340,29 +340,33 @@ void display( void )
 					
 					modelMat = Angel::Translate(0,0,-ztrans ) /* * Angel::RotateY(picture[numclick].thetaY) */;
 			
-					//modelMat = Angel::Translate(stepX,stepY,stepZ) * modelMat;
+					modelMat = Angel::Translate(stepX,stepY,stepZ) * modelMat;
 
 					//create matrix for rotate
 					//if( numclick == 1)
-					//modelMat =  pointodir[i]*  modelMat;//Angel::RotateY(25)*
+					modelMat =  pointodir[i]*  modelMat;//Angel::RotateY(25)*
 
 					//if(element[Lsysnum].leftsystem[i] != 'F'){
 						//modelMat =  pointodir[i]*  modelMat;
-						modelMat =  Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
-						
-					//}
+
+					modelMat =  Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
 					drawtree(0);
+					drawtree(1);
+					/*if(element[Lsysnum].leftsystem[i] != 'F'){
+							modelMat =  Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
+						
 					
-					//drawtree(1);
-					if(element[Lsysnum].leftsystem[i] == 'F')
+							drawtree(0);
+						}*/
+
+					/*if(element[Lsysnum].leftsystem[i] == 'F')
 						{
-					////		
+		
 							modelMat =  pointodir[i]*  modelMat;
-					//modelMat =  Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
+							modelMat =  Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
 							drawtree(1);
-					////		//drawtree(0);
-					////
-						}
+	
+						}*/
 
 
 					// set up projection matricies
