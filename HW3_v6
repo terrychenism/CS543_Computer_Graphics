@@ -323,28 +323,29 @@ void drawtree(int picnum)
 void display( void )
 {
 	//Angel::mat4 mv = Angel::LookAt(vec4 eye, vec4 at, vec4 up); 
-	mat4 viewMat = LookAt( vec4(0,0,300,1), vec4(0,0,0,1), vec4(0,1,0,0) );
+	mat4 viewMat = LookAt( vec4(0,0,100,1), vec4(0,0,0,1), vec4(0,1,0,0) );
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
 	mat4 modelMat;
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
-	//for (Lsysnum = 0; Lsysnum < 4; Lsysnum++){
+	for (Lsysnum = 0; Lsysnum < 4; Lsysnum++){
 			for(int i = 0; i < element[Lsysnum].length; i++ )
 			{	
 					/*modelMat = modelMat *Angel::Translate(-(picture[numclick].xMAX + picture[numclick].xMIN)/2,-(picture[numclick].yMAX + picture[numclick].yMIN)/2,-(picture[numclick].zMAX + picture[numclick].zMIN)/2);
 					*/
 					//modelMat = modelMat * mv;
+					//modelMat = modelMat * Angel::Translate(0.0, 0.0, -2.0f) * Angel::RotateY(45.0f) * Angel::RotateX(35.0f);
 
 					ztrans = sqrt(pow(picture[numclick].xMAX-picture[numclick].xMIN,2)+pow(picture[numclick].yMAX-picture[numclick].yMIN,2)+pow(picture[numclick].zMAX-picture[numclick].zMIN,2));
-					//modelMat = Angel::RotateZ(90.0f) * modelMat;
+					
 					modelMat = Angel::Scale(1,1,1)* Angel::Translate(0,0,-ztrans )  /** Angel::RotateY(picture[numclick].thetaY) * Angel::RotateX(0.0f)*/ ;
 			
 					modelMat = Angel::Translate(stepX,stepY,stepZ) * modelMat;
 					 //create matrix for rotate
-					modelMat = modelMat * pointodir[i];
+					modelMat = modelMat* pointodir[i] ;
 					modelMat = Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
-					//modelMat = modelMat * Angel::Translate(0.0, 0.0, -2.0f) * Angel::RotateY(45.0f) * Angel::RotateX(35.0f);
-	
+
+					
 					// set up projection matricies
 					mat4 m = viewMat * modelMat;
 					GLuint modelMatrix = glGetUniformLocationARB(program, "model_matrix");
@@ -352,18 +353,14 @@ void display( void )
 					GLuint projectionMatrix = glGetUniformLocationARB(program, "projection_matrix");
 					glUniformMatrix4fv( projectionMatrix, 1, GL_TRUE, perspectiveMat);
 
-
+					
 	
 					drawtree(0);
 					drawtree(1);
 			}
-	//}
+	}
 
 	//drawpic(numclick);
-	/*if(element[Lsysnum].leftsystem[0] == 'F')
-	{
-		drawtree(numclick);
-	}*/
 	//drawCube();
 
 	if(keyboard_value=='e')
@@ -827,14 +824,14 @@ void generatelinetree()
 				{
 					lsys[Lsysnum].rotateX = RotateX(element[Lsysnum].rotx);
 					//modelMat = modelMat *lsys[Lsysnum].rotateX;
-					Direction = Direction * RotateX(element[Lsysnum].rotx);
+					Direction = RotateX(element[Lsysnum].rotx)* Direction;
 					currentdirection =lsys[Lsysnum].rotateX * currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '-')
 				{
 					lsys[Lsysnum].rotateX = RotateX(-element[Lsysnum].rotx);
 					//modelMat = modelMat *lsys[Lsysnum].rotateX;
-					Direction = Direction * RotateX(element[Lsysnum].rotx);
+					Direction =  RotateX(element[Lsysnum].rotx)* Direction ;
 					currentdirection = lsys[Lsysnum].rotateX *currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '&')
@@ -898,10 +895,8 @@ void generatelinetree()
 				pointodraw[count].z = currentposition.z;
 				pointodraw[count].w = currentposition.w;*/
 
-				
-				
-				
 				pointodraw[i] = Angel::RotateY(90.0f) * currentposition;
+				
 				pointodir[i] = Direction;
 		
 			}
