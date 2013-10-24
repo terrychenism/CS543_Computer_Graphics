@@ -203,9 +203,9 @@ vec4 randomPoint()
     srand(unsigned(time(0)));
     
 	
-		point.x = GLfloat(random(0,200));
-		point.y = GLfloat(random(0,200));
-		point.z = GLfloat(random(0,200));	
+		point.x = GLfloat(random(-20,20));
+		point.y = GLfloat(random(-20,20));
+		point.z = GLfloat(random(-20,20));	
 	
      return point;
 }
@@ -323,7 +323,7 @@ void drawtree(int picnum)
 void display( void )
 {
 	//Angel::mat4 mv = Angel::LookAt(vec4 eye, vec4 at, vec4 up); 
-	mat4 viewMat = LookAt( vec4(0,0,10,1), vec4(0,0,0,1), vec4(0,1,0,0) );
+	mat4 viewMat = LookAt( vec4(0,0,300,1), vec4(0,0,0,1), vec4(0,1,0,0) );
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
 	mat4 modelMat;
 
@@ -336,12 +336,12 @@ void display( void )
 			//modelMat = modelMat * mv;
 
 			ztrans = sqrt(pow(picture[numclick].xMAX-picture[numclick].xMIN,2)+pow(picture[numclick].yMAX-picture[numclick].yMIN,2)+pow(picture[numclick].zMAX-picture[numclick].zMIN,2));
-			//modelMat = Angel::Scale(1,1,1)* Angel::Translate(0,0,-ztrans )  *Angel::RotateY(picture[numclick].thetaY) * Angel::RotateX(0.0f) ;
-			//modelMat = Angel::RotateX(90.0f) * modelMat;
-			//modelMat = Angel::Translate(stepX,stepY,stepZ) * modelMat;
-			//modelMat = Angel::Translate((picture[numclick].xMAX-picture[numclick].xMIN)/2-pointodraw[i].x, picture[numclick].yMIN-pointodraw[i].y,(picture[numclick].zMAX-picture[numclick].yMIN)/2 -pointodraw[i].z) * modelMat;
-			//modelMat = modelMat * pointodir[i]; //create matrix for rotate
+			//modelMat = Angel::RotateZ(90.0f) * modelMat;
+			modelMat = Angel::Scale(1,1,1)* Angel::Translate(0,0,-ztrans )  /** Angel::RotateY(picture[numclick].thetaY) * Angel::RotateX(0.0f)*/ ;
 			
+			modelMat = Angel::Translate(stepX,stepY,stepZ) * modelMat;
+			//modelMat = modelMat * pointodir[i]; //create matrix for rotate
+			modelMat = Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
 			//modelMat = modelMat * Angel::Translate(0.0, 0.0, -2.0f) * Angel::RotateY(45.0f) * Angel::RotateX(35.0f);
 	
 			// set up projection matricies
@@ -353,8 +353,8 @@ void display( void )
 
 
 	
-			drawtree(0);
-			//drawtree(1);
+			//drawtree(0);
+			drawtree(1);
 	}
 
 
@@ -798,7 +798,8 @@ void generatelinetree()
 	int count= 0;
 
 	//for(Lsysnum = 0; Lsysnum < 5; Lsysnum++){
-			currentposition = randomPoint();
+			//currentposition = randomPoint();
+			currentposition = (1,1,1,1);
 			pointodraw[count] = currentposition;
 	
 	
@@ -896,7 +897,10 @@ void generatelinetree()
 				pointodraw[count].z = currentposition.z;
 				pointodraw[count].w = currentposition.w;*/
 
-				pointodraw[i] = currentposition;
+				
+				
+				
+				pointodraw[i] = Angel::RotateY(90.0f) * currentposition;
 				pointodir[i] = Direction;
 		
 			}
@@ -973,25 +977,29 @@ void ReadPlyFile(char *FileName,int i)
 					picture[i].zMIN=picture[i].Vertex_Buffer[iterator*3+2];
 				}				
 			}
+
+	
 		//cout<<picture[i].xMAX<<","<<picture[i].xMIN<<endl;	
 		//cout<<picture[i].yMAX<<","<<picture[i].yMIN<<endl;
 		//cout<<picture[i].zMAX<<","<<picture[i].zMIN<<endl;
 
 
 			Angel::mat4 modelMat = Angel::identity();
-			modelMat = modelMat *Angel::Translate(-(picture[i].xMAX + picture[i].xMIN)/2,-(picture[i].yMAX + picture[i].yMIN)/2,-(picture[i].zMAX + picture[i].zMIN)/2) * Angel::RotateX(90.0f);//* Angel::RotateX(90.0f)
+			modelMat = modelMat* Angel::Scale(0.1,0.1,0.1)*Angel::RotateX(90.0f) *Angel::Translate(-(picture[i].xMAX + picture[i].xMIN)/2,-(picture[i].yMAX + picture[i].yMIN)/2,-(picture[i].zMAX + picture[i].zMIN)/2) ;//* Angel::RotateX(90.0f)
+		
+			
 		for(int iterator = 0; iterator < picture[i].numvertex; iterator++){
 			Angel::vec4 modelvertex(
 			picture[i].Vertex_Buffer[iterator*3],
 			picture[i].Vertex_Buffer[iterator*3+1],
 			picture[i].Vertex_Buffer[iterator*3+2],
 			1.0
-		);
-		modelvertex=modelMat*modelvertex;
-		picture[i].Vertex_Buffer[iterator*3] = modelvertex.x;
-		picture[i].Vertex_Buffer[iterator*3+1] = modelvertex.y;
-		picture[i].Vertex_Buffer[iterator*3+2] = modelvertex.z;
-	}
+			);
+			modelvertex=modelMat*modelvertex;
+			picture[i].Vertex_Buffer[iterator*3] = modelvertex.x;
+			picture[i].Vertex_Buffer[iterator*3+1] = modelvertex.y;
+			picture[i].Vertex_Buffer[iterator*3+2] = modelvertex.z;
+		}
 		picture[i].xMAX=0;
 		picture[i].xMIN=0;
 		picture[i].yMAX=0;
@@ -1023,7 +1031,7 @@ void ReadPlyFile(char *FileName,int i)
 				
 			}
 
-		//modelMat = modelMat * Angel::Translate(picture[i].xMIN+currentposition.x,picture[i].yMIN+currentposition.y,picture[i].zMIN-currentposition.z);
+		//modelMat = modelMat* Angel::Translate(picture[i].xMIN+currentposition.x,picture[i].yMIN+currentposition.y,picture[i].zMIN-currentposition.z);
 		
 
 			// read faces
@@ -1127,11 +1135,11 @@ int main( int argc, char **argv )
 	// create window
 	// opengl can be incorperated into other packages like wxwidgets, fltoolkit, etc.
     glutCreateWindow( "Color Cube" );
-	//ReadTxtFile("lsys1.txt",0);
-	//ReadTxtFile("lsys2.txt",1);
+	ReadTxtFile("lsys1.txt",0);
+	//ReadTxtFile("lsys2.txt",0);
 	//ReadTxtFile("lsys3.txt",2);
-	//ReadTxtFile("lsys4.txt",3);
-	ReadTxtFile("lsys5.txt",0);
+	//ReadTxtFile("lsys4.txt",0);
+	//ReadTxtFile("lsys5.txt",0);
 	
 	// init glew
     glewInit();
