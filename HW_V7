@@ -30,6 +30,7 @@ bool pulsingaction=true;
 int numclick=0;
 int Lsysnum=0;
 
+
 float stepX=0,stepY=0,stepZ=0;
 // remember to prototype
 void generateGeometry( void );
@@ -49,6 +50,8 @@ typedef Angel::vec3  point3;
 vec4 currentposition;
 vec4 pointodraw[9999];
 mat4 pointodir[9999];
+vec4 PointoDraw[5000];
+mat4 rotateMat[5000];
 // handle to program
 GLuint program;
 
@@ -113,11 +116,13 @@ class token
 		char* leftsystem;
 		int initlength;
 		int length;
+		int count;
 		size_t s;
 	token()
 	{
 		initlength=0;
 		length=0;
+		count= 0;
 		s=0;
 	}
 	~token()
@@ -205,7 +210,7 @@ vec4 randomPoint()
 	
 		point.x = GLfloat(random(-20,50));
 		point.y = GLfloat(random(-20,50));
-		point.z = GLfloat(random(-50,20));	
+		point.z = GLfloat(random(-20,50));	
 	
      return point;
 }
@@ -323,50 +328,42 @@ void drawtree(int picnum)
 void display( void )
 {
 	//Angel::mat4 mv = Angel::LookAt(vec4 eye, vec4 at, vec4 up); 
-	mat4 viewMat = LookAt( vec4(0,0,15,1), vec4(0,0,0,1), vec4(0,1,0,0) );
+	mat4 viewMat = LookAt( vec4(0,0,50,1), vec4(0,0,0,1), vec4(0,1,0,0) );
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
 	mat4 modelMat;
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
 	for (Lsysnum = 0; Lsysnum < 4; Lsysnum++){
-			for(int i = 0; i < element[Lsysnum].length; i++ )
+			for(int i = 0; i < element[Lsysnum].count; i++ )
 			{	
 					/*modelMat = modelMat *Angel::Translate(-(picture[numclick].xMAX + picture[numclick].xMIN)/2,-(picture[numclick].yMAX + picture[numclick].yMIN)/2,-(picture[numclick].zMAX + picture[numclick].zMIN)/2);
 					*/
 					//modelMat = modelMat * mv;
 					//modelMat = modelMat * Angel::Translate(0.0, 0.0, -2.0f) * Angel::RotateY(45.0f) * Angel::RotateX(35.0f);
+					
 
 					ztrans = sqrt(pow(picture[numclick].xMAX-picture[numclick].xMIN,2)+pow(picture[numclick].yMAX-picture[numclick].yMIN,2)+pow(picture[numclick].zMAX-picture[numclick].zMIN,2));
 					
-					modelMat = Angel::Translate(0,0,-ztrans ) /* * Angel::RotateY(picture[numclick].thetaY) */;
+					modelMat = Angel::Translate(0,0,-ztrans ) /** Angel::RotateY(picture[numclick].thetaY)*/ ;
 			
 					modelMat = Angel::Translate(stepX,stepY,stepZ) * modelMat;
 
-					//create matrix for rotate
-					//if( numclick == 1)
-					modelMat =  pointodir[i]*  modelMat;//Angel::RotateY(25)*
-
-					//if(element[Lsysnum].leftsystem[i] != 'F'){
-						//modelMat =  pointodir[i]*  modelMat;
-
-					modelMat =  Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
+					//create matrix for rotate   vec4 PointoDraw[5000];mat4 rotateMat[5000];
+					modelMat = rotateMat[i] * modelMat;
+					
+					modelMat = Angel::Translate(PointoDraw[i].x,PointoDraw[i].y,PointoDraw[i].z) * modelMat;
+					
 					drawtree(0);
 					drawtree(1);
-					/*if(element[Lsysnum].leftsystem[i] != 'F'){
-							modelMat =  Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
-						
 					
-							drawtree(0);
-						}*/
-
-					/*if(element[Lsysnum].leftsystem[i] == 'F')
-						{
-		
-							modelMat =  pointodir[i]*  modelMat;
-							modelMat =  Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
-							drawtree(1);
+					//if(element[Lsysnum].leftsystem[i] == 'F')
+						//{
+							
+							//modelMat =  pointodir[i]*  modelMat;
+							//modelMat =  Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
+							//drawtree(1);
 	
-						}*/
+					//	}
 
 
 					// set up projection matricies
@@ -806,6 +803,7 @@ struct TurtleState
 {
 	vec4 currentposition;
 	vec4 currentdirection;
+	mat4 Direction;
 };
 
 void generatelinetree()
@@ -813,19 +811,19 @@ void generatelinetree()
 	std::vector<TurtleState> stateStack;
 
 	vec4 currentdirection;
-	Angel::mat4 Direction = Angel::identity();;
+	mat4 Direction = Angel::identity();
 	currentdirection.x = 0.0f;
 	currentdirection.y = 1.0f;
 	currentdirection.z = 0.0f;
 	currentdirection.w = 0.0f;
-	int count= 0;
+	//int count= 0;
 
 	//for(Lsysnum = 0; Lsysnum < 5; Lsysnum++){
 			currentposition = randomPoint();
 			currentposition = (1,1,1,1);
-			pointodraw[count] = currentposition;
-	
-	
+			//pointodraw[0] = Angel::RotateY(90.0f)*currentposition;
+			//PointoDraw[0] = Angel::RotateY(90.0f)*currentposition;
+			//rotateMat[0] = Angel::RotateY(90.0f) * Direction;
 			//Angel::mat4 modelMat = Angel::identity();
 			for(int i = 0; i < element[Lsysnum].length; i++ )
 			{
@@ -833,13 +831,16 @@ void generatelinetree()
 				if(element[Lsysnum].leftsystem[i] == 'F')
 				{
 					cout<<"good"<<endl;
-					count++;
+					
 			
 					//lsys[Lsysnum].tranY = Translate(currentdirection.x*element[Lsysnum].len, currentdirection.y*element[Lsysnum].len, currentdirection.z*element[Lsysnum].len);			
 					////modelMat = modelMat *lsys[Lsysnum].tranY;
 					//currentposition = lsys[Lsysnum].tranY * currentposition;
-
+					
+					PointoDraw[element[Lsysnum].count] = Angel::RotateY(90.0f)* currentposition ;
+					rotateMat[element[Lsysnum].count] = Angel::RotateY(90.0f)* Direction ;
 					currentposition = currentposition + currentdirection*element[Lsysnum].len;
+					element[Lsysnum].count++;
 				}
 				//else if(element[Lsysnum].leftstart[i] == 'f')
 				//{
@@ -850,41 +851,42 @@ void generatelinetree()
 					lsys[Lsysnum].rotateX = RotateX(element[Lsysnum].rotx);
 					//modelMat = modelMat *lsys[Lsysnum].rotateX;
 					Direction =  RotateX(element[Lsysnum].rotx) * Direction ;
-					currentdirection =lsys[Lsysnum].rotateX * currentdirection;
+					currentdirection = lsys[Lsysnum].rotateX * currentdirection;
+					
 				}
 				else if(element[Lsysnum].leftsystem[i] == '-')
 				{
 					lsys[Lsysnum].rotateX = RotateX(-element[Lsysnum].rotx);
 					//modelMat = modelMat *lsys[Lsysnum].rotateX;
-					Direction =   RotateX(element[Lsysnum].rotx) * Direction ;
-					currentdirection = lsys[Lsysnum].rotateX *currentdirection;
+					Direction =  RotateX(element[Lsysnum].rotx) * Direction ;
+					currentdirection = lsys[Lsysnum].rotateX * currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '&')
 				{
 					lsys[Lsysnum].rotateY = RotateY(element[Lsysnum].roty);
 					//modelMat = modelMat *lsys[Lsysnum].rotateY;
-					Direction = RotateX(element[Lsysnum].roty) * Direction ;
+					Direction = RotateY(element[Lsysnum].roty) * Direction ;
 					currentposition = lsys[Lsysnum].rotateY*currentposition;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '^')
 				{
 					lsys[Lsysnum].rotateY = RotateY(-element[Lsysnum].roty);
 					//modelMat = modelMat *lsys[Lsysnum].rotateY;
-					Direction =  RotateX(element[Lsysnum].roty) * Direction;
+					Direction =  RotateY(element[Lsysnum].roty) * Direction;
 					currentposition = lsys[Lsysnum].rotateY*currentposition;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '\\')
 				{
 					lsys[Lsysnum].rotateZ = RotateZ(element[Lsysnum].rotz);
 					//modelMat = modelMat *lsys[Lsysnum].rotateZ;
-					Direction =  RotateX(element[Lsysnum].rotz)  * Direction;
+					Direction =  RotateZ(element[Lsysnum].rotz)  * Direction;
 					currentposition = lsys[Lsysnum].rotateZ*currentposition;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '/')
 				{
 					lsys[Lsysnum].rotateZ = RotateZ(-element[Lsysnum].rotz);
 					//modelMat = modelMat *lsys[Lsysnum].rotateZ;
-					Direction =  RotateX(element[Lsysnum].rotz) * Direction;
+					Direction =  RotateZ(element[Lsysnum].rotz) * Direction;
 					currentposition = lsys[Lsysnum].rotateZ *currentposition;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '|')
@@ -892,7 +894,7 @@ void generatelinetree()
 					//currentdirection.x = currentdirection.x * -1;
 					//currentdirection.y = currentdirection.y * -1;
 					//currentdirection.z = currentdirection.z * -1;
-
+					Direction = Direction;
 					currentdirection = -currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '[')
@@ -900,8 +902,9 @@ void generatelinetree()
 					TurtleState s;
 					s.currentdirection = currentdirection;
 					s.currentposition = currentposition;
+					s.Direction = Direction;
 					stateStack.push_back(s);
-					Direction = Direction;
+					
 				}
 				else if(element[Lsysnum].leftsystem[i] == ']')
 				{
@@ -910,7 +913,7 @@ void generatelinetree()
 					stateStack.pop_back();
 					currentdirection = s.currentdirection;
 					currentposition = s.currentposition;
-					Direction = Direction;
+					Direction = s.Direction;
 				}
 				else
 					cout<< "ERROR!"<<endl;
@@ -922,9 +925,11 @@ void generatelinetree()
 				pointodraw[count].z = currentposition.z;
 				pointodraw[count].w = currentposition.w;*/
 
-				pointodraw[i] = Angel::RotateY(90.0f) * currentposition;
+				//pointodraw[i+1] = Angel::RotateY(90.0f) * currentposition;
 				
-				pointodir[i] =  Angel::RotateY(90.0f) * Direction;
+				//pointodir[i+1] =  Angel::RotateY(90.0f) * Direction;
+
+
 		
 			}
 	//}
@@ -1006,8 +1011,8 @@ void ReadPlyFile(char *FileName,int i)
 		//cout<<picture[i].yMAX<<","<<picture[i].yMIN<<endl;
 		//cout<<picture[i].zMAX<<","<<picture[i].zMIN<<endl;
 
-			Angel::mat4 modelMat = Angel::identity();
-		
+		Angel::mat4 modelMat = Angel::identity();
+		//modelMat = modelMat *Angel::Translate(-(picture[i].xMAX + picture[i].xMIN)/2,-(picture[i].yMAX + picture[i].yMIN)/2,-(picture[i].zMAX + picture[i].zMIN)/2);
 			//modelMat = modelMat* Angel::RotateX(90.0f);	
 		//	modelMat = modelMat* Angel::Scale(0.1,0.1,0.1)*Angel::RotateX(90.0f) *Angel::Translate(-(picture[i].xMAX + picture[i].xMIN)/2,-(picture[i].yMAX + picture[i].yMIN)/2,-(picture[i].zMAX + picture[i].zMIN)/2) ;//* Angel::RotateX(90.0f)
 		
@@ -1170,11 +1175,11 @@ int main( int argc, char **argv )
 	// create window
 	// opengl can be incorperated into other packages like wxwidgets, fltoolkit, etc.
     glutCreateWindow( "Color Cube" );
-	//ReadTxtFile("lsys1.txt",0);
+	ReadTxtFile("lsys1.txt",0);
 	//ReadTxtFile("lsys2.txt",0);
 	//ReadTxtFile("lsys3.txt",0);
 	//ReadTxtFile("lsys4.txt",3);
-	ReadTxtFile("lsys5.txt",0);
+	//ReadTxtFile("lsys5.txt",0);
 	
 	// init glew
     glewInit();
