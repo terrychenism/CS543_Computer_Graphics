@@ -328,7 +328,7 @@ void drawtree(int picnum)
 void display( void )
 {
 	//Angel::mat4 mv = Angel::LookAt(vec4 eye, vec4 at, vec4 up); 
-	mat4 viewMat = LookAt( vec4(0,0,15,1), vec4(0,0,0,1), vec4(0,1,0,0) );
+	mat4 viewMat = LookAt( vec4(0,0,80,1), vec4(0,0,0,1), vec4(0,1,0,0) );
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
 	mat4 modelMat;
 
@@ -837,8 +837,8 @@ void generatelinetree()
 					////modelMat = modelMat *lsys[Lsysnum].tranY;
 					//currentposition = lsys[Lsysnum].tranY * currentposition;
 					
-					PointoDraw[element[Lsysnum].count] = Angel::RotateY(-90.0f)* currentposition ;
-					rotateMat[element[Lsysnum].count] = Angel::RotateY(-90.0f)* Direction ;
+					PointoDraw[element[Lsysnum].count] = Angel::RotateY(90.0f) * currentposition ;
+					rotateMat[element[Lsysnum].count] = Angel::RotateY(90.0f)*  Direction ;
 					currentposition = currentposition + currentdirection*element[Lsysnum].len;
 					element[Lsysnum].count++;
 				}
@@ -864,30 +864,30 @@ void generatelinetree()
 				else if(element[Lsysnum].leftsystem[i] == '&')
 				{
 					lsys[Lsysnum].rotateY = RotateY(element[Lsysnum].roty);
-					//modelMat = modelMat *lsys[Lsysnum].rotateY;
+					//modelMat = modelMat *lsys[Lsysnum].rotateX;
 					Direction = RotateY(element[Lsysnum].roty) * Direction ;
-					currentposition = lsys[Lsysnum].rotateY*currentposition;
+					currentdirection = lsys[Lsysnum].rotateY * currentdirection;
 				}
-				//else if(element[Lsysnum].leftsystem[i] == '^')
-				//{
-				//	lsys[Lsysnum].rotateY = RotateY(element[Lsysnum].roty);
-				//	//modelMat = modelMat *lsys[Lsysnum].rotateY;
-				//	Direction =  RotateY(element[Lsysnum].roty) * Direction;
-				//	currentposition = lsys[Lsysnum].rotateY*currentposition;
-				//}
+				else if(element[Lsysnum].leftsystem[i] == '^')
+				{
+					lsys[Lsysnum].rotateY = RotateY(-element[Lsysnum].roty);
+					//modelMat = modelMat *lsys[Lsysnum].rotateX;
+					Direction = RotateY(-element[Lsysnum].roty) * Direction ;
+					currentdirection = lsys[Lsysnum].rotateY * currentdirection;
+				}
 				else if(element[Lsysnum].leftsystem[i] == '\\')
 				{
 					lsys[Lsysnum].rotateZ = RotateZ(element[Lsysnum].rotz);
 					//modelMat = modelMat *lsys[Lsysnum].rotateZ;
 					Direction =  RotateZ(element[Lsysnum].rotz)  * Direction;
-					currentposition = lsys[Lsysnum].rotateZ*currentposition;
+					currentdirection = lsys[Lsysnum].rotateZ*currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '/')
 				{
 					lsys[Lsysnum].rotateZ = RotateZ(-element[Lsysnum].rotz);
 					//modelMat = modelMat *lsys[Lsysnum].rotateZ;
 					Direction =  RotateZ(-element[Lsysnum].rotz) * Direction;
-					currentposition = lsys[Lsysnum].rotateZ *currentposition;
+					currentdirection = lsys[Lsysnum].rotateZ *currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '|')
 				{
@@ -1175,11 +1175,11 @@ int main( int argc, char **argv )
 	// create window
 	// opengl can be incorperated into other packages like wxwidgets, fltoolkit, etc.
     glutCreateWindow( "Color Cube" );
-	//ReadTxtFile("lsys1.txt",0);
+	ReadTxtFile("lsys1.txt",0);
 	ReadTxtFile("lsys2.txt",1);
-	//ReadTxtFile("lsys3.txt",2);
-	//ReadTxtFile("lsys4.txt",3);
-	//ReadTxtFile("lsys5.txt",0);
+	ReadTxtFile("lsys3.txt",2);
+	ReadTxtFile("lsys4.txt",3);
+	ReadTxtFile("lsys5.txt",4);
 	
 	// init glew
     glewInit();
