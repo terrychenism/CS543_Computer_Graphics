@@ -1,9 +1,12 @@
-// Two-Dimensional Sierpinski Gasket       
-// Generated using randomly selected vertices and bisection
-
 #include "Angel.h"
 #include "math.h"
+#include <cassert>
+#include "math.h"
+#include <ctime>
+#include <cstdlib>
+#include <vector>
 
+using namespace std;
 //----------------------------------------------------------------------------
 int width = 0;
 int height = 0;
@@ -21,6 +24,8 @@ bool normalaction=true;
 bool boundaction=true;
 bool pulsingaction=true;
 int numclick=0;
+int Lsysnum=0;
+
 
 float stepX=0,stepY=0,stepZ=0;
 // remember to prototype
@@ -32,11 +37,9 @@ void colorcube(void);
 void drawCube(void);
 void ReadPlyFile(char *FileName,int i);
 void idle( void );
-void doIterate(int num);
-void generatelinetree(void);
-typedef Angel::vec4  color4;
-typedef Angel::vec4  point4;
-typedef Angel::vec3  point3;
+void doIterate(int num,int iteratenum);
+void generatelinetree(int Lsysnum);
+
 
 
 // handle to program
@@ -44,9 +47,6 @@ GLuint program;
 
 using namespace std;
 
-//const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
-//point4 points[NumVertices];
-//color4 colors[NumVertices];
 
 class vertexdata
 {
@@ -90,7 +90,7 @@ public:
 
 };
 
-vertexdata picture[43];
+vertexdata picture[2];
 
 class token
 {
@@ -99,15 +99,41 @@ class token
 		GLfloat	rotx, roty, rotz;
 		char start;
 		char leftstart[40];
-		char* rightstart;
+		char* rightsystem;
+		char* leftsystem;
+		int initlength;
+		int length;
+		int count;
+		vec4 PointoDraw[5000];
+		mat4 rotateMat[5000];
+		size_t s;
+	token()
+	{
+		initlength=0;
+		length=0;
+		count= 0;
+		s=0;
+	}
 	~token()
 	{
-		delete rightstart;
+		delete rightsystem;
+		delete leftsystem;
 	}
 
 };
-token element[4];
+token element[5];
 
+class Lsystem
+{
+	public:
+		mat4 tranX;
+		mat4 tranY;
+		mat4 tranZ;
+		mat4 rotateX;
+		mat4 rotateY;
+		mat4 rotateZ;
+};
+Lsystem lsys[50];
 
 void colorcube()
 {
@@ -164,6 +190,24 @@ void drawnormal(){
 
 	 }	
 
+vec4 randomPoint( float min, float max)
+{
+        Angel::vec4 point(0, 0, 0, 1);
+    double random(double,double);
+    srand(unsigned(time(0)));
+    
+        
+                point.x = GLfloat(random(min,max));
+				//point.y = GLfloat(random(min,max));
+                point.z = GLfloat(random(min,max));       
+        
+     return point;
+}
+double random(double start, double end)
+{ 
+        return start+(end-start)*rand()/(RAND_MAX);
+}
+
 
 
 GLuint vao;
@@ -189,7 +233,6 @@ void generateGeometry( void )
     glClearColor( 0.0, 0.0, 0.0, 1.0 ); // black background
 }
 
-
 void drawCube(void)
 {
 	colorcube();
@@ -207,107 +250,109 @@ void drawCube(void)
 	glDisable( GL_DEPTH_TEST ); 
 }
 
-void drawpic(int i)
+//void drawpic(int i)
+//{
+//
+//
+//     //Create and initialize a buffer object
+//	
+//	// sets the default color to clear screen
+//    glClearColor( 0.0, 0.0, 0.0, 1.0 ); // white background
+//
+//	// change to GL_FILL
+//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+//
+//	glEnable( GL_DEPTH_TEST );
+//	glBindBuffer( GL_ARRAY_BUFFER, picture[i].m_VBO );
+//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,  picture[i].m_IBO );
+//	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
+//	glEnableVertexAttribArray( vPosition );
+//	glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,
+//			   BUFFER_OFFSET(0) );
+//
+//	GLuint vStep = glGetUniformLocation( program, "step" );
+//
+//	glUniform1f(vStep, picture[numclick].stepN);
+//
+//	GLuint vPulsing = glGetUniformLocation( program, "pulsing" );
+//	if(keyboard_value=='B'){
+//		glUniform1i(vPulsing, true);
+//	}
+//	else
+//	{
+//		glUniform1i(vPulsing, false);
+//	}
+//
+//	GLuint vNormal = glGetUniformLocation( program, "face_normal" );
+//	for( int i = 0; i < picture[numclick].numface; i++ )
+//	{
+//		// 1 update current triangle normal
+//		//glUniform3fv(vNormal, 1, picture[numclick].currentNormal);
+//		glUniform3f(vNormal,  picture[numclick].currentNormal[3*i],picture[numclick].currentNormal[3*i+1],picture[numclick].currentNormal[3*i+2]);
+//		// 2 draw current tirangle face
+//		unsigned int offset = sizeof(unsigned int)*3*i;
+//		glDrawElements(  GL_TRIANGLES, 3, GL_UNSIGNED_INT,  (GLvoid*)offset);
+//	}
+//
+//	//glDrawArrays( GL_TRIANGLES, 0, picture[0].numface*3 );
+//	//glDrawElements(  GL_TRIANGLES, picture[i].numface*3, GL_UNSIGNED_INT,  0);
+//	glDisable( GL_DEPTH_TEST ); 
+//}
+
+void drawpic(int picnum)
 {
-
-
-     //Create and initialize a buffer object
-	
-	// sets the default color to clear screen
-    glClearColor( 0.0, 0.0, 0.0, 1.0 ); // white background
-
-	// change to GL_FILL
+	glClearColor( 0.0, 0.0, 0.0, 1.0 ); // white background
 	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
 	glEnable( GL_DEPTH_TEST );
-	glBindBuffer( GL_ARRAY_BUFFER, picture[i].m_VBO );
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,  picture[i].m_IBO );
+	glBindBuffer( GL_ARRAY_BUFFER, picture[picnum].m_VBO );
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,  picture[picnum].m_IBO );
 	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
 	glEnableVertexAttribArray( vPosition );
 	glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,
 			   BUFFER_OFFSET(0) );
-
-	GLuint vStep = glGetUniformLocation( program, "step" );
-
-	glUniform1f(vStep, picture[numclick].stepN);
-
-	GLuint vPulsing = glGetUniformLocation( program, "pulsing" );
-	if(keyboard_value=='B'){
-		glUniform1i(vPulsing, true);
-	}
-	else
-	{
-		glUniform1i(vPulsing, false);
-	}
-
-	GLuint vNormal = glGetUniformLocation( program, "face_normal" );
-	for( int i = 0; i < picture[numclick].numface; i++ )
-	{
-		// 1 update current triangle normal
-		//glUniform3fv(vNormal, 1, picture[numclick].currentNormal);
-		glUniform3f(vNormal,  picture[numclick].currentNormal[3*i],picture[numclick].currentNormal[3*i+1],picture[numclick].currentNormal[3*i+2]);
-		// 2 draw current tirangle face
-		unsigned int offset = sizeof(unsigned int)*3*i;
-		glDrawElements(  GL_TRIANGLES, 3, GL_UNSIGNED_INT,  (GLvoid*)offset);
-	}
-
-	//glDrawArrays( GL_TRIANGLES, 0, picture[0].numface*3 );
-	//glDrawElements(  GL_TRIANGLES, picture[i].numface*3, GL_UNSIGNED_INT,  0);
+	glDrawElements( GL_TRIANGLES, picture[picnum].numface*3, GL_UNSIGNED_INT,  0);
 	glDisable( GL_DEPTH_TEST ); 
 }
 
-
-void display( void )
+void drawtree(int num )
 {
-	
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
-
-
+	Lsysnum=num;
+	mat4 viewMat = LookAt( vec4(0,0,200,1), vec4(0,0,0,1), vec4(0,1,0,0) );
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
+	mat4 modelMat;
+	for(int i = 0; i < element[Lsysnum].count; i++ )
+			{	
+					ztrans = sqrt(pow(picture[numclick].xMAX-picture[numclick].xMIN,2)+pow(picture[numclick].yMAX-picture[numclick].yMIN,2)+pow(picture[numclick].zMAX-picture[numclick].zMIN,2));
+					
+					modelMat = Angel::Translate(0,0,-ztrans ) ;
 
+					modelMat = element[Lsysnum].rotateMat[i] * modelMat;
+					
+					modelMat = Angel::Translate(element[Lsysnum].PointoDraw[i].x,element[Lsysnum].PointoDraw[i].y,element[Lsysnum].PointoDraw[i].z) * modelMat;
+					
+					drawpic(0);
+					drawpic(1);
+										
+					// set up projection matricies
+					mat4 m = viewMat * modelMat;
+					GLuint modelMatrix = glGetUniformLocationARB(program, "model_matrix");
+					glUniformMatrix4fv( modelMatrix, 1, GL_TRUE, m );
+					GLuint projectionMatrix = glGetUniformLocationARB(program, "projection_matrix");
+					glUniformMatrix4fv( projectionMatrix, 1, GL_TRUE, perspectiveMat);
 
-	float viewMatrixf[16];
-	viewMatrixf[0] = perspectiveMat[0][0];viewMatrixf[4] = perspectiveMat[0][1];
-	viewMatrixf[1] = perspectiveMat[1][0];viewMatrixf[5] = perspectiveMat[1][1];
-	viewMatrixf[2] = perspectiveMat[2][0];viewMatrixf[6] = perspectiveMat[2][1];
-	viewMatrixf[3] = perspectiveMat[3][0];viewMatrixf[7] = perspectiveMat[3][1];
+			}
+}
 
-	viewMatrixf[8] = perspectiveMat[0][2];viewMatrixf[12] = perspectiveMat[0][3];
-	viewMatrixf[9] = perspectiveMat[1][2];viewMatrixf[13] = perspectiveMat[1][3];
-	viewMatrixf[10] = perspectiveMat[2][2];viewMatrixf[14] = perspectiveMat[2][3];
-	viewMatrixf[11] = perspectiveMat[3][2];viewMatrixf[15] = perspectiveMat[3][3];
-	
-	Angel::mat4 modelMat = Angel::identity();
-	/*modelMat = modelMat *Angel::Translate(-(picture[numclick].xMAX + picture[numclick].xMIN)/2,-(picture[numclick].yMAX + picture[numclick].yMIN)/2,-(picture[numclick].zMAX + picture[numclick].zMIN)/2);
-	*/
+void display( )
+{
 
-	ztrans = sqrt(pow(picture[numclick].xMAX-picture[numclick].xMIN,2)+pow(picture[numclick].yMAX-picture[numclick].yMIN,2)+pow(picture[numclick].zMAX-picture[numclick].zMIN,2));
-	modelMat = modelMat *Angel::Scale(1,1,1)* Angel::Translate(0,0,-ztrans )  *Angel::RotateY(picture[numclick].thetaY) * Angel::RotateY(0.0f);
-	modelMat = modelMat *Angel::Translate(stepX,stepY,stepZ);
-	
-	//modelMat = modelMat * Angel::Translate(0.0, 0.0, -2.0f) * Angel::RotateY(45.0f) * Angel::RotateX(35.0f);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
+	for (Lsysnum = 0; Lsysnum < 5; Lsysnum++){
 
-	float modelMatrixf[16];
-	modelMatrixf[0] = modelMat[0][0];modelMatrixf[4] = modelMat[0][1];
-	modelMatrixf[1] = modelMat[1][0];modelMatrixf[5] = modelMat[1][1];
-	modelMatrixf[2] = modelMat[2][0];modelMatrixf[6] = modelMat[2][1];
-	modelMatrixf[3] = modelMat[3][0];modelMatrixf[7] = modelMat[3][1];
-
-	modelMatrixf[8] = modelMat[0][2];modelMatrixf[12] = modelMat[0][3];
-	modelMatrixf[9] = modelMat[1][2];modelMatrixf[13] = modelMat[1][3];
-	modelMatrixf[10] = modelMat[2][2];modelMatrixf[14] = modelMat[2][3];
-	modelMatrixf[11] = modelMat[3][2];modelMatrixf[15] = modelMat[3][3];
-	
-	// set up projection matricies
-	GLuint modelMatrix = glGetUniformLocationARB(program, "model_matrix");
-	glUniformMatrix4fv( modelMatrix, 1, GL_FALSE, modelMatrixf );
-	GLuint viewMatrix = glGetUniformLocationARB(program, "projection_matrix");
-	glUniformMatrix4fv( viewMatrix, 1, GL_FALSE, viewMatrixf);
-
-
-	drawpic(numclick);
-
-	//drawCube();
+		drawtree(Lsysnum);
+			
+	}				
+					
 
 	if(keyboard_value=='e')
 	{	
@@ -326,15 +371,7 @@ void display( void )
 		}
 		cout<<"normal\n";
 	}
-	if(keyboard_value=='B')
-	{
-		//if(!pulsingaction){
-			
-			//cout<<"pulsing \n";
-		//}
-		
-		
-	}
+
 
     glFlush(); // force output to graphics hardware
 
@@ -342,6 +379,7 @@ void display( void )
 	glutSwapBuffers();
 	// you can implement your own buffers with textures
 }
+
 
 
 void keyboard( unsigned char key, int x, int y )
@@ -352,7 +390,7 @@ void keyboard( unsigned char key, int x, int y )
         break;
 	case 'W':
 		keyboard_value='W';
-		numclick=21; 
+		numclick=1; 
 		stepX=0;
 		stepY=0;
 		stepZ=0;
@@ -364,7 +402,7 @@ void keyboard( unsigned char key, int x, int y )
 		stepZ=0;
 		keyboard_value='N';
 		numclick++; 
-		if(numclick==43){
+		if(numclick==2){
 			numclick=0;
 		}
 		display();
@@ -372,8 +410,8 @@ void keyboard( unsigned char key, int x, int y )
 	case 'P':
 		keyboard_value='P';
 		numclick--; 
-		if(numclick==0){
-			numclick=42;
+		if(numclick==-1){
+			numclick=1;
 		}
 		display();
 		break;
@@ -545,7 +583,7 @@ void idle( void )
 				}
 				glutPostRedisplay();
 
-				if(numclick == 43)
+				if(numclick == 2)
 					numclick = 0;
 
 			}
@@ -587,7 +625,7 @@ void ReadTxtFile(char *FileName,int numtoken)
 	
 	FILE *inStream;
 
-	char buffer[99];
+	char buffer[999];
 	if((inStream = fopen(FileName, "rt")) == NULL) // Open The File
 	{
 		printf("File does not exist!");
@@ -639,100 +677,221 @@ void ReadTxtFile(char *FileName,int numtoken)
 			sscanf(buffer,"%s", &element[numtoken].leftstart);
 			
 		fclose(inStream);
+
+		//copy to R+L system
+		element[numtoken].length = strlen(element[numtoken].leftstart);
+
+		element[numtoken].rightsystem = new char[element[numtoken].length+1];
+		element[numtoken].leftsystem = new char[element[numtoken].length+1];
+		
+		for(int i=0; i < element[numtoken].length; i++)
+		{
+			element[numtoken].rightsystem[i] = element[numtoken].leftstart[i];
+		}
+		element[numtoken].rightsystem[element[numtoken].length] = '\0';
+
+		doIterate(numtoken,element[numtoken].iter-1);
 		
 }
 
-void doIterate(int num)
+void doIterate(int num,int iteratenum)
 {
-	int count=0;
-	int i,a,length;
-	int j=0;
-	length = strlen(element[num].leftstart);
-	for( i=0;i < length;i++)
-	{
-		if(element[num].leftstart[i]=='F')
-		{
-			count++;
-		}
-		element[num].rightstart = new char[length*count+(length-count)];
-
-	}
+	unsigned int count=0;
+	unsigned int i,a;
+	unsigned int j=0;
+	unsigned int b=0;
 	
-	while ( j < (length*count+(length-count)))
+	element[num].initlength = strlen(element[num].leftstart);
+	for(int itime=1; itime <= iteratenum; itime++)
 	{
-		for(i=0;i<length;i++)
-		{
-			if(element[num].leftstart[i]=='F')
-			{
-				for(a=0;a<length;a++)
-				{
-					element[num].rightstart[j]=element[num].leftstart[a];
-					j++;
-				}
+		count=0;
+		element[num].length = strlen(element[num].rightsystem);//iterate length
 
-			}
-			else
+			for( i=0;i < element[num].length;i++)
 			{
-				element[num].rightstart[j]=element[num].leftstart[i];
-				j++;
+				if(element[num].rightsystem[i]=='F')
+				{
+					count++;
+				}
 			}
 			
-		}
+			element[num].s = element[num].initlength*count+(element[num].length-count);
+			size_t s = element[num].s;
+			size_t mb = s / 1024 / 1024;
+			element[num].leftsystem = (char *)malloc(element[num].s+1);
+
+			//new leftsystem
+			for( j = 0 ; j < element[num].s;)
+			{
+				for(i=0;i< element[num].length;i++)
+				{
+					if(element[num].rightsystem[i]=='F')
+					{
+						for(a=0;a < element[num].initlength;a++)
+						{
+							element[num].leftsystem[j]=element[num].leftstart[a];
+							j++;
+						}
+
+					}
+					else
+					{
+						element[num].leftsystem[j]=element[num].rightsystem[i];
+						j++;
+					}
+					
+				}
+				
+			}
+			element[num].leftsystem[j] = '\0';
+
+			//new rightsystem
+			element[num].rightsystem = (char *)malloc(element[num].s+1);
+
+			for( b=0; b < element[num].s; b++ )
+			{
+				element[num].rightsystem[b]=element[num].leftsystem[b];
+				
+			}
+			element[num].rightsystem[element[num].s] = '\0';
 	}
+	element[num].length = strlen(element[num].leftsystem);
+	Lsysnum = num;
+	generatelinetree(num);
 }
 
-void generatelinetree(void)
+struct TurtleState
 {
-	for(int i = 0; i < length; i++ )
-	{
-		if(element[num].leftstart[i] == 'F')
-		{
+	vec4 currentposition;
+	vec4 currentdirection;
+	mat4 Direction;
+};
 
-		}
-		else if(element[num].leftstart[i] == 'f')
-		{
+void generatelinetree(int Lsysnum)
+{
+	std::vector<TurtleState> stateStack;
+	vec4 currentposition /*= randomPoint(-70.0f,70.0f)*/;
+	vec4 currentdirection;
+	currentdirection.x = 0.0f;
+	currentdirection.y = 1.0f;
+	currentdirection.z = 0.0f;
+	currentdirection.w = 0.0f;
+	mat4 Direction = Angel::identity();
 
-		}
-		else if(element[num].leftstart[i] == '+')
-		{
+	//for(Lsysnum = 0; Lsysnum < 5; Lsysnum++){
+		
 
-		}
-		else if(element[num].leftstart[i] == '-')
-		{
+		switch (Lsysnum){
+			case 0:
+				currentposition = randomPoint(-30.0f,30.0f);
+				break;
+			case 1:
+				currentposition = randomPoint(-80.0f,80.0f);
+				break;
+			case 2:
+				currentposition = randomPoint(-100.0f,100.0f);
+				break;
+			case 3:
+				currentposition = randomPoint(-30.0f,30.0f);
+				break;
+			case 4:
+				currentposition = randomPoint(-100.0f,100.0f);
+				break;
+			}
 
-		}
-		else if(element[num].leftstart[i] == '&')
-		{
 
-		}
-		else if(element[num].leftstart[i] == '^')
-		{
+			for(int i = 0; i < element[Lsysnum].length; i++ )
+			{
+		
+				if(element[Lsysnum].leftsystem[i] == 'F')
+				{
 
-		}
-		else if(element[num].leftstart[i] == '\\')
-		{
+					
+					element[Lsysnum].PointoDraw[element[Lsysnum].count] = Angel::RotateY(-90.0f) * currentposition ;
+					element[Lsysnum].rotateMat[element[Lsysnum].count] = Angel::RotateY(-90.0f)*  Direction ;
+					currentposition = currentposition + currentdirection*element[Lsysnum].len;
+					element[Lsysnum].count++;
+				}
+				//else if(element[Lsysnum].leftstart[i] == 'f')
 
-		}
-		else if(element[num].leftstart[i] == '/')
-		{
+				else if(element[Lsysnum].leftsystem[i] == '+')
+				{
+					lsys[Lsysnum].rotateX = RotateX(element[Lsysnum].rotx);
 
-		}
-		else if(element[num].leftstart[i] == '|')
-		{
+					Direction = RotateX(element[Lsysnum].rotx) * Direction ;
+					currentdirection = lsys[Lsysnum].rotateX * currentdirection;
+					
+				}
+				else if(element[Lsysnum].leftsystem[i] == '-')
+				{
+					lsys[Lsysnum].rotateX = RotateX(-element[Lsysnum].rotx);
 
-		}
-		else if(element[num].leftstart[i] == '[')
-		{
+					Direction = RotateX(-element[Lsysnum].rotx) * Direction ;
+					currentdirection = lsys[Lsysnum].rotateX * currentdirection;
+				}
+				else if(element[Lsysnum].leftsystem[i] == '&')
+				{
+					lsys[Lsysnum].rotateY = RotateY(element[Lsysnum].roty);
 
-		}
-		else if(element[num].leftstart[i] == ']')
-		{
+					Direction = RotateY(element[Lsysnum].roty) * Direction ;
+					currentdirection = lsys[Lsysnum].rotateY * currentdirection;
+				}
+				else if(element[Lsysnum].leftsystem[i] == '^')
+				{
+					lsys[Lsysnum].rotateY = RotateY(-element[Lsysnum].roty);
 
-		}
-		else
-			std::cout<< "ERROR! Unrecognized character detected: "<< next<<".\n Ignoring this character.\n";
-	}
+					Direction = RotateY(-element[Lsysnum].roty) * Direction ;
+					currentdirection = lsys[Lsysnum].rotateY * currentdirection;
+				}
+				else if(element[Lsysnum].leftsystem[i] == '\\')
+				{
+					lsys[Lsysnum].rotateZ = RotateZ(element[Lsysnum].rotz);
+
+					Direction =  RotateZ(element[Lsysnum].rotz)  * Direction;
+					currentdirection = lsys[Lsysnum].rotateZ*currentdirection;
+				}
+				else if(element[Lsysnum].leftsystem[i] == '/')
+				{
+					lsys[Lsysnum].rotateZ = RotateZ(-element[Lsysnum].rotz);
+
+					Direction =  RotateZ(-element[Lsysnum].rotz) * Direction;
+					currentdirection = lsys[Lsysnum].rotateZ *currentdirection;
+				}
+				else if(element[Lsysnum].leftsystem[i] == '|')
+				{
+
+					Direction = Direction;
+					currentdirection = -currentdirection;
+				}
+				else if(element[Lsysnum].leftsystem[i] == '[')
+				{
+					TurtleState s;
+					s.currentdirection = currentdirection;
+					s.currentposition = currentposition;
+					s.Direction = Direction;
+					stateStack.push_back(s);
+					
+				}
+				else if(element[Lsysnum].leftsystem[i] == ']')
+				{
+					TurtleState s;
+					s = stateStack.back();
+					stateStack.pop_back();
+					currentdirection = s.currentdirection;
+					currentposition = s.currentposition;
+					Direction = s.Direction;
+				}
+				else
+					cout<< "ERROR!"<<endl;
+
+
+
+		
+			}
+	//}
+
 }
+
 void ReadPlyFile(char *FileName,int i)
 {
 	
@@ -802,25 +961,41 @@ void ReadPlyFile(char *FileName,int i)
 					picture[i].zMIN=picture[i].Vertex_Buffer[iterator*3+2];
 				}				
 			}
+
+	
 		//cout<<picture[i].xMAX<<","<<picture[i].xMIN<<endl;	
 		//cout<<picture[i].yMAX<<","<<picture[i].yMIN<<endl;
 		//cout<<picture[i].zMAX<<","<<picture[i].zMIN<<endl;
 
-
-			Angel::mat4 modelMat = Angel::identity();
-			modelMat = modelMat *Angel::Translate(-(picture[i].xMAX + picture[i].xMIN)/2,-(picture[i].yMAX + picture[i].yMIN)/2,-(picture[i].zMAX + picture[i].zMIN)/2);
+		Angel::mat4 modelMat = Angel::identity();
+		//modelMat = modelMat *Angel::Translate(-(picture[i].xMAX + picture[i].xMIN)/2,-(picture[i].yMAX + picture[i].yMIN)/2,-(picture[i].zMAX + picture[i].zMIN)/2);
+			//modelMat = modelMat* Angel::RotateX(90.0f);	
+		//	modelMat = modelMat* Angel::Scale(0.1,0.1,0.1)*Angel::RotateX(90.0f) *Angel::Translate(-(picture[i].xMAX + picture[i].xMIN)/2,-(picture[i].yMAX + picture[i].yMIN)/2,-(picture[i].zMAX + picture[i].zMIN)/2) ;//* Angel::RotateX(90.0f)
+		
+		/*if( i==0 )
+			modelMat = modelMat* Angel::Scale(1/(picture[i].yMAX-picture[i].yMIN)/20,1/(picture[i].yMAX-picture[i].yMIN),(picture[i].yMAX-picture[i].yMIN)/10)* Angel::RotateX(90.0f) *	Angel::Translate(0,(picture[i].yMAX-picture[i].yMIN)/2,0);
+		else modelMat = modelMat* Angel::Scale(1/(picture[i].yMAX-picture[i].yMIN)/20,1/(picture[i].yMAX-picture[i].yMIN)/20,(picture[i].yMAX-picture[i].yMIN)/10);*/
+		
+			//modelMat = modelMat* Angel::Translate(0,(picture[i].yMAX-picture[i].yMIN)/2,0)* Angel::RotateX(90.0f)* Angel::Scale(1/(picture[i].yMAX-picture[i].yMIN)/20,1/(picture[i].yMAX-picture[i].yMIN),(picture[i].yMAX-picture[i].yMIN)/10);	
+		if (i == 0)     //sphere
+			modelMat = modelMat* Angel::Scale((picture[0].xMAX-picture[0].xMIN)/20,(picture[i].yMAX-picture[i].yMIN)/20,(picture[i].zMAX-picture[i].zMIN)/20);
+		else if( i == 1 )  //cylinder
+			modelMat = modelMat* Angel::Translate(0,(picture[i].yMAX-picture[i].yMIN)/5,0)* Angel::RotateX(90.0f)* Angel::Scale((picture[0].xMAX-picture[0].xMIN)/(picture[i].xMAX-picture[i].xMIN),(picture[0].yMAX-picture[0].yMIN)/(picture[i].yMAX-picture[i].yMIN),1/(picture[i].zMAX-picture[i].zMIN));	
+			
 		for(int iterator = 0; iterator < picture[i].numvertex; iterator++){
 			Angel::vec4 modelvertex(
 			picture[i].Vertex_Buffer[iterator*3],
 			picture[i].Vertex_Buffer[iterator*3+1],
 			picture[i].Vertex_Buffer[iterator*3+2],
 			1.0
-		);
-		modelvertex=modelMat*modelvertex;
-		picture[i].Vertex_Buffer[iterator*3] = modelvertex.x;
-		picture[i].Vertex_Buffer[iterator*3+1] = modelvertex.y;
-		picture[i].Vertex_Buffer[iterator*3+2] = modelvertex.z;
-	}
+			);
+			modelvertex=modelMat*modelvertex;
+			
+			picture[i].Vertex_Buffer[iterator*3] = modelvertex.x;
+			picture[i].Vertex_Buffer[iterator*3+1] = modelvertex.y;
+			picture[i].Vertex_Buffer[iterator*3+2] = modelvertex.z;
+		}
+
 		picture[i].xMAX=0;
 		picture[i].xMIN=0;
 		picture[i].yMAX=0;
@@ -851,6 +1026,9 @@ void ReadPlyFile(char *FileName,int i)
 				}
 				
 			}
+
+
+		
 
 			// read faces
 
@@ -937,14 +1115,12 @@ void ReadPlyFile(char *FileName,int i)
 		fclose(inStream);
 }
 
-
-
 int main( int argc, char **argv )
 {
 	// init glut
     glutInit( &argc, argv );
     glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
-    glutInitWindowSize( 512, 512 );
+    glutInitWindowSize( 800,800 );
 	width = 512;
 	height = 512;
 
@@ -959,10 +1135,13 @@ int main( int argc, char **argv )
 	ReadTxtFile("lsys2.txt",1);
 	ReadTxtFile("lsys3.txt",2);
 	ReadTxtFile("lsys4.txt",3);
-	doIterate(0);
+	ReadTxtFile("lsys5.txt",4);
+	
 	// init glew
     glewInit();
-	ReadPlyFile("weathervane.ply",0);
+	ReadPlyFile("sphere.ply",0);
+	ReadPlyFile("cylinder.ply",1);
+	/*ReadPlyFile("weathervane.ply",0);
 	ReadPlyFile("airplane.ply",1);
 	ReadPlyFile("ant.ply",2);
 	ReadPlyFile("apple.ply",3);
@@ -1004,7 +1183,7 @@ int main( int argc, char **argv )
 	ReadPlyFile("trashcan.ply",39);
 	ReadPlyFile("turbine.ply",40);
 	ReadPlyFile("urn2.ply",41);
-	ReadPlyFile("walkman.ply",42);
+	ReadPlyFile("walkman.ply",42);*/
 
 
 
