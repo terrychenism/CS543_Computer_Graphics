@@ -104,6 +104,7 @@ class token
 		int initlength;
 		int length;
 		int count;
+		vec4 currentposition;
 		vec4 PointoDraw[5000];
 		mat4 rotateMat[5000];
 		size_t s;
@@ -198,7 +199,7 @@ vec4 randomPoint( float min, float max)
     
         
                 point.x = GLfloat(random(min,max));
-				//point.y = GLfloat(random(min,max));
+				point.y = -40.0f;
                 point.z = GLfloat(random(min,max));       
         
      return point;
@@ -316,7 +317,27 @@ void drawpic(int picnum)
 
 void drawtree(int num )
 {
-	Lsysnum=num;
+	//for (Lsysnum = 0; Lsysnum < 5; Lsysnum++){	
+	
+	/*switch (Lsysnum){
+			case 0:
+				element[Lsysnum].currentposition = randomPoint(-100.0f,-50.0f);
+				break;
+			case 1:
+				element[Lsysnum].currentposition = randomPoint(-50.0f,-20.0f);
+				break;
+			case 2:
+				element[Lsysnum].currentposition = randomPoint(-20.0f,30.0f);
+				break;
+			case 3:
+				element[Lsysnum].currentposition = randomPoint(30.0f,60.0f);
+				break;
+			case 4:
+				element[Lsysnum].currentposition = randomPoint(60.0f,100.0f);
+				break;
+			}
+		generatelinetree(Lsysnum);
+	}*/
 	mat4 viewMat = LookAt( vec4(0,0,300,1), vec4(0,0,0,1), vec4(0,1,0,0) );
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
 	mat4 modelMat;
@@ -347,14 +368,15 @@ void display( )
 {
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
-	//for (int i = 0; i < 15; i++){
+	//for (int i = 0; i < 15; i++)
 
-		for (Lsysnum = 0; Lsysnum < 5; Lsysnum++){	
+		for (Lsysnum = 0; Lsysnum < 5; Lsysnum++)
+
 		//Lsysnum=int(random(0,4));
 	
 		drawtree(Lsysnum);
 			
-	}				
+					
 					
 
 	if(keyboard_value=='e')
@@ -773,7 +795,6 @@ struct TurtleState
 void generatelinetree(int Lsysnum)
 {
 	std::vector<TurtleState> stateStack;
-	vec4 currentposition;
 	vec4 currentdirection;
 	currentdirection.x = 0.0f;
 	currentdirection.y = 1.0f;
@@ -786,19 +807,19 @@ void generatelinetree(int Lsysnum)
 
 		switch (Lsysnum){
 			case 0:
-				currentposition = randomPoint(-30.0f,30.0f);
+				element[Lsysnum].currentposition = randomPoint(-100.0f,100.0f);
 				break;
 			case 1:
-				currentposition = randomPoint(30.0f,50.0f);
+				element[Lsysnum].currentposition = randomPoint(-50.0f,-50.0f);
 				break;
 			case 2:
-				currentposition = randomPoint(50.0f,80.0f);
+				element[Lsysnum].currentposition = randomPoint(-20.0f,30.0f);
 				break;
 			case 3:
-				currentposition = randomPoint(80.0f,90.0f);
+				element[Lsysnum].currentposition = randomPoint(-30.0f,60.0f);
 				break;
 			case 4:
-				currentposition = randomPoint(90.0f,100.0f);
+				element[Lsysnum].currentposition = randomPoint(-60.0f,100.0f);
 				break;
 			}
 
@@ -810,9 +831,9 @@ void generatelinetree(int Lsysnum)
 				{
 
 					
-					element[Lsysnum].PointoDraw[element[Lsysnum].count] = Angel::RotateY(-90.0f) * currentposition ;
+					element[Lsysnum].PointoDraw[element[Lsysnum].count] = Angel::RotateY(-90.0f) * element[Lsysnum].currentposition ;
 					element[Lsysnum].rotateMat[element[Lsysnum].count] = Angel::RotateY(-90.0f)*  Direction ;
-					currentposition = currentposition + currentdirection*element[Lsysnum].len;
+					element[Lsysnum].currentposition = element[Lsysnum].currentposition + currentdirection*element[Lsysnum].len;
 					element[Lsysnum].count++;
 				}
 				//else if(element[Lsysnum].leftstart[i] == 'f')
@@ -870,7 +891,7 @@ void generatelinetree(int Lsysnum)
 				{
 					TurtleState s;
 					s.currentdirection = currentdirection;
-					s.currentposition = currentposition;
+					s.currentposition = element[Lsysnum].currentposition;
 					s.Direction = Direction;
 					stateStack.push_back(s);
 					
@@ -881,7 +902,7 @@ void generatelinetree(int Lsysnum)
 					s = stateStack.back();
 					stateStack.pop_back();
 					currentdirection = s.currentdirection;
-					currentposition = s.currentposition;
+					element[Lsysnum].currentposition = s.currentposition;
 					Direction = s.Direction;
 				}
 				else
