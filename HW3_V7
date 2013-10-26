@@ -1,6 +1,3 @@
-// Two-Dimensional Sierpinski Gasket       
-// Generated using randomly selected vertices and bisection
-
 #include "Angel.h"
 #include "math.h"
 #include <cassert>
@@ -10,7 +7,6 @@
 #include <vector>
 
 using namespace std;
-
 //----------------------------------------------------------------------------
 int width = 0;
 int height = 0;
@@ -42,14 +38,9 @@ void drawCube(void);
 void ReadPlyFile(char *FileName,int i);
 void idle( void );
 void doIterate(int num,int iteratenum);
-void generatelinetree( void );
+void generatelinetree(int Lsysnum);
 
-typedef Angel::vec4  color4;
-typedef Angel::vec4  point4;
-typedef Angel::vec3  point3;
-vec4 currentposition;
-vec4 pointodraw[9999];
-mat4 pointodir[9999];
+
 vec4 PointoDraw[5000];
 mat4 rotateMat[5000];
 // handle to program
@@ -57,9 +48,6 @@ GLuint program;
 
 using namespace std;
 
-//const int NumVertices = 36; //(6 faces)(2 triangles/face)(3 vertices/triangle)
-//point4 points[NumVertices];
-//color4 colors[NumVertices];
 
 class vertexdata
 {
@@ -201,23 +189,25 @@ void drawnormal(){
 
 	 }	
 
-vec4 randomPoint()
+vec4 randomPoint( float min, float max)
 {
-	Angel::vec4 point(0, 0, 0, 1);
+        Angel::vec4 point(0, 0, 0, 1);
     double random(double,double);
     srand(unsigned(time(0)));
     
-	
-		point.x = GLfloat(random(-20,50));
-		point.y = GLfloat(random(-20,50));
-		point.z = GLfloat(random(-20,50));	
-	
+        
+                point.x = GLfloat(random(min,max));
+				//point.y = GLfloat(random(min,max));
+                point.z = GLfloat(random(min,max));       
+        
      return point;
 }
 double random(double start, double end)
 { 
-	return start+(end-start)*rand()/(RAND_MAX+ 1.0);
+        return start+(end-start)*rand()/(RAND_MAX);
 }
+
+
 
 GLuint vao;
 void generateGeometry( void )
@@ -328,44 +318,26 @@ void drawtree(int picnum)
 void display( void )
 {
 	//Angel::mat4 mv = Angel::LookAt(vec4 eye, vec4 at, vec4 up); 
-	mat4 viewMat = LookAt( vec4(0,0,30,1), vec4(0,0,0,1), vec4(0,1,0,0) );
+	mat4 viewMat = LookAt( vec4(0,0,200,1), vec4(0,0,0,1), vec4(0,1,0,0) );
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
 	mat4 modelMat;
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
-	for (Lsysnum = 0; Lsysnum < 4; Lsysnum++){
-			for(int i = 0; i < 5 /*element[Lsysnum].count*/; i++ )
+	for (Lsysnum = 0; Lsysnum < 5; Lsysnum++){
+	
+			for(int i = 0; i < element[Lsysnum].count; i++ )
 			{	
-					/*modelMat = modelMat *Angel::Translate(-(picture[numclick].xMAX + picture[numclick].xMIN)/2,-(picture[numclick].yMAX + picture[numclick].yMIN)/2,-(picture[numclick].zMAX + picture[numclick].zMIN)/2);
-					*/
-					//modelMat = modelMat * mv;
-					//modelMat = modelMat * Angel::Translate(0.0, 0.0, -2.0f) * Angel::RotateY(45.0f) * Angel::RotateX(35.0f);
-					
-
 					ztrans = sqrt(pow(picture[numclick].xMAX-picture[numclick].xMIN,2)+pow(picture[numclick].yMAX-picture[numclick].yMIN,2)+pow(picture[numclick].zMAX-picture[numclick].zMIN,2));
 					
-					modelMat = Angel::Translate(0,0,-ztrans ) /** Angel::RotateY(picture[numclick].thetaY)*/ ;
-			
-					//modelMat = Angel::Translate(stepX,stepY,stepZ) * modelMat;
+					modelMat = Angel::Translate(0,0,-ztrans ) ;
 
-					//create matrix for rotate   vec4 PointoDraw[5000];mat4 rotateMat[5000];
 					modelMat = rotateMat[i] * modelMat;
 					
 					modelMat = Angel::Translate(PointoDraw[i].x,PointoDraw[i].y,PointoDraw[i].z) * modelMat;
 					
 					drawtree(0);
 					drawtree(1);
-					
-					//if(element[Lsysnum].leftsystem[i] == 'F')
-						//{
-							
-							//modelMat =  pointodir[i]*  modelMat;
-							//modelMat =  Angel::Translate(pointodraw[i].x,pointodraw[i].y,-pointodraw[i].z) * modelMat ;
-							//drawtree(1);
-	
-					//	}
-
-
+										
 					// set up projection matricies
 					mat4 m = viewMat * modelMat;
 					GLuint modelMatrix = glGetUniformLocationARB(program, "model_matrix");
@@ -373,17 +345,9 @@ void display( void )
 					GLuint projectionMatrix = glGetUniformLocationARB(program, "projection_matrix");
 					glUniformMatrix4fv( projectionMatrix, 1, GL_TRUE, perspectiveMat);
 
-
-					
-					
-					
-					
-					
 			}
-	}
-
-	//drawpic(numclick);
-	//drawCube();
+	}				
+					
 
 	if(keyboard_value=='e')
 	{	
@@ -402,15 +366,7 @@ void display( void )
 		}
 		cout<<"normal\n";
 	}
-	if(keyboard_value=='B')
-	{
-		//if(!pulsingaction){
-			
-			//cout<<"pulsing \n";
-		//}
-		
-		
-	}
+
 
     glFlush(); // force output to graphics hardware
 
@@ -796,7 +752,7 @@ void doIterate(int num,int iteratenum)
 	}
 	element[num].length = strlen(element[num].leftsystem);
 	Lsysnum = num;
-	generatelinetree();
+	generatelinetree(num);
 }
 
 struct TurtleState
@@ -806,50 +762,58 @@ struct TurtleState
 	mat4 Direction;
 };
 
-void generatelinetree()
+void generatelinetree(int Lsysnum)
 {
 	std::vector<TurtleState> stateStack;
-
+	vec4 currentposition = randomPoint(-70.0f,70.0f);
 	vec4 currentdirection;
 	mat4 Direction = Angel::identity();
 	currentdirection.x = 0.0f;
 	currentdirection.y = 1.0f;
 	currentdirection.z = 0.0f;
 	currentdirection.w = 0.0f;
-	//int count= 0;
+	
 
 	//for(Lsysnum = 0; Lsysnum < 5; Lsysnum++){
-			currentposition = randomPoint();
-			currentposition = (1,1,1,1);
-			//pointodraw[0] = Angel::RotateY(90.0f)*currentposition;
-			//PointoDraw[0] = Angel::RotateY(90.0f)*currentposition;
-			//rotateMat[0] = Angel::RotateY(90.0f) * Direction;
-			//Angel::mat4 modelMat = Angel::identity();
+		
+
+	/*	switch (Lsysnum){
+			case 0:
+				currentposition = randomPoint(-30.0f,30.0f);
+				break;
+			case 1:
+				currentposition = randomPoint(-30.0f,30.0f);
+				break;
+			case 2:
+				currentposition = randomPoint(-30.0f,30.0f);
+				break;
+			case 3:
+				currentposition = randomPoint(-30.0f,30.0f);
+				break;
+			case 4:
+				currentposition = randomPoint(-30.0f,30.0f);
+				break;
+			}*/
+
+
 			for(int i = 0; i < element[Lsysnum].length; i++ )
 			{
 		
 				if(element[Lsysnum].leftsystem[i] == 'F')
 				{
-					cout<<"good"<<endl;
+
 					
-			
-					//lsys[Lsysnum].tranY = Translate(currentdirection.x*element[Lsysnum].len, currentdirection.y*element[Lsysnum].len, currentdirection.z*element[Lsysnum].len);			
-					////modelMat = modelMat *lsys[Lsysnum].tranY;
-					//currentposition = lsys[Lsysnum].tranY * currentposition;
-					
-					PointoDraw[element[Lsysnum].count] = Angel::RotateY(90.0f)* currentposition ;
-					rotateMat[element[Lsysnum].count] = Angel::RotateY(90.0f)* Direction ;
+					PointoDraw[element[Lsysnum].count] = Angel::RotateY(-90.0f) * currentposition ;
+					rotateMat[element[Lsysnum].count] = Angel::RotateY(-90.0f)*  Direction ;
 					currentposition = currentposition + currentdirection*element[Lsysnum].len;
 					element[Lsysnum].count++;
 				}
 				//else if(element[Lsysnum].leftstart[i] == 'f')
-				//{
 
-				//}
 				else if(element[Lsysnum].leftsystem[i] == '+')
 				{
 					lsys[Lsysnum].rotateX = RotateX(element[Lsysnum].rotx);
-					//modelMat = modelMat *lsys[Lsysnum].rotateX;
+
 					Direction = RotateX(element[Lsysnum].rotx) * Direction ;
 					currentdirection = lsys[Lsysnum].rotateX * currentdirection;
 					
@@ -857,43 +821,41 @@ void generatelinetree()
 				else if(element[Lsysnum].leftsystem[i] == '-')
 				{
 					lsys[Lsysnum].rotateX = RotateX(-element[Lsysnum].rotx);
-					//modelMat = modelMat *lsys[Lsysnum].rotateX;
+
 					Direction = RotateX(-element[Lsysnum].rotx) * Direction ;
 					currentdirection = lsys[Lsysnum].rotateX * currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '&')
 				{
 					lsys[Lsysnum].rotateY = RotateY(element[Lsysnum].roty);
-					//modelMat = modelMat *lsys[Lsysnum].rotateY;
+
 					Direction = RotateY(element[Lsysnum].roty) * Direction ;
-					currentposition = lsys[Lsysnum].rotateY*currentposition;
+					currentdirection = lsys[Lsysnum].rotateY * currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '^')
 				{
 					lsys[Lsysnum].rotateY = RotateY(-element[Lsysnum].roty);
-					//modelMat = modelMat *lsys[Lsysnum].rotateY;
-					Direction =  RotateY(-element[Lsysnum].roty) * Direction;
-					currentposition = lsys[Lsysnum].rotateY*currentposition;
+
+					Direction = RotateY(-element[Lsysnum].roty) * Direction ;
+					currentdirection = lsys[Lsysnum].rotateY * currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '\\')
 				{
 					lsys[Lsysnum].rotateZ = RotateZ(element[Lsysnum].rotz);
-					//modelMat = modelMat *lsys[Lsysnum].rotateZ;
+
 					Direction =  RotateZ(element[Lsysnum].rotz)  * Direction;
-					currentposition = lsys[Lsysnum].rotateZ*currentposition;
+					currentdirection = lsys[Lsysnum].rotateZ*currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '/')
 				{
 					lsys[Lsysnum].rotateZ = RotateZ(-element[Lsysnum].rotz);
-					//modelMat = modelMat *lsys[Lsysnum].rotateZ;
+
 					Direction =  RotateZ(-element[Lsysnum].rotz) * Direction;
-					currentposition = lsys[Lsysnum].rotateZ *currentposition;
+					currentdirection = lsys[Lsysnum].rotateZ *currentdirection;
 				}
 				else if(element[Lsysnum].leftsystem[i] == '|')
 				{
-					//currentdirection.x = currentdirection.x * -1;
-					//currentdirection.y = currentdirection.y * -1;
-					//currentdirection.z = currentdirection.z * -1;
+
 					Direction = Direction;
 					currentdirection = -currentdirection;
 				}
@@ -918,22 +880,12 @@ void generatelinetree()
 				else
 					cout<< "ERROR!"<<endl;
 
-				// save point
-		
-				/*pointodraw[count].x = currentposition.x;
-				pointodraw[count].y = currentposition.y;
-				pointodraw[count].z = currentposition.z;
-				pointodraw[count].w = currentposition.w;*/
-
-				//pointodraw[i+1] = Angel::RotateY(90.0f) * currentposition;
-				
-				//pointodir[i+1] =  Angel::RotateY(90.0f) * Direction;
 
 
 		
 			}
 	//}
-	//cout<<count<<endl;
+
 }
 
 void ReadPlyFile(char *FileName,int i)
@@ -1164,7 +1116,7 @@ int main( int argc, char **argv )
 	// init glut
     glutInit( &argc, argv );
     glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH );
-    glutInitWindowSize( 512, 512 );
+    glutInitWindowSize( 800,800 );
 	width = 512;
 	height = 512;
 
@@ -1175,11 +1127,11 @@ int main( int argc, char **argv )
 	// create window
 	// opengl can be incorperated into other packages like wxwidgets, fltoolkit, etc.
     glutCreateWindow( "Color Cube" );
-	//ReadTxtFile("lsys1.txt",0);
-	//ReadTxtFile("lsys2.txt",1);
-	//ReadTxtFile("lsys3.txt",2);
-	//ReadTxtFile("lsys4.txt",3);
-	ReadTxtFile("lsys5.txt",0);
+	ReadTxtFile("lsys1.txt",0);
+	ReadTxtFile("lsys2.txt",1);
+	ReadTxtFile("lsys3.txt",2);
+	ReadTxtFile("lsys4.txt",3);
+	ReadTxtFile("lsys5.txt",4);
 	
 	// init glew
     glewInit();
