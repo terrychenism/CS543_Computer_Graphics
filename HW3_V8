@@ -208,7 +208,7 @@ vec4 randomPoint( float min, float max)
     
         
                 point.x = GLfloat(random(min,max));
-               // point.y = GLfloat(random(min,max));
+				point.y = GLfloat(random(min,max));
                 point.z = GLfloat(random(min,max));       
         
      return point;
@@ -819,9 +819,9 @@ void generatelinetree()
 	currentdirection.w = 0.0f;
 	//int count= 0;
 
-	//for(Lsysnum = 0; Lsysnum < 5; Lsysnum++){
-		currentposition.x = randomPoint(60.0f,70.0f).x;
-		currentposition.z = randomPoint(60.0f,100.0f).z;
+	for(Lsysnum = 0; Lsysnum < 5; Lsysnum++){
+		currentposition = randomPoint(-70.0f,70.0f);
+
 	//currentposition = randomPoint(40.0f);
 		//currentposition.x = 30;
 		//currentposition.y = 10;
@@ -956,7 +956,7 @@ void generatelinetree()
 
 		
 			}
-	//}
+	}
 	//cout<<count<<endl;
 }
 
@@ -1199,11 +1199,11 @@ int main( int argc, char **argv )
 	// create window
 	// opengl can be incorperated into other packages like wxwidgets, fltoolkit, etc.
     glutCreateWindow( "Color Cube" );
-	//ReadTxtFile("lsys1.txt",0);
-	//ReadTxtFile("lsys2.txt",1);
+	ReadTxtFile("lsys1.txt",0);
+	ReadTxtFile("lsys2.txt",1);
 	ReadTxtFile("lsys3.txt",2);
-	//ReadTxtFile("lsys4.txt",3);
-	//ReadTxtFile("lsys5.txt",4);
+	ReadTxtFile("lsys4.txt",3);
+	ReadTxtFile("lsys5.txt",4);
 	
 	// init glew
     glewInit();
