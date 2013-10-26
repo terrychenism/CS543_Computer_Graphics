@@ -1,0 +1,22 @@
+double SymmetricRandom(unsigned int uiSeed = 0)
+{
+    if( uiSeed > 0 )
+	{
+        srand(uiSeed);
+	}
+
+    double ratio = ((double)rand())/((double)(RAND_MAX));
+    return 2.0*ratio - 1.0;
+}
+
+
+	for( int i = 0; i < TreeCount; ++i )
+	{
+		mTreeNum[i] = rand() % 5;
+		float maxRadiusX = 80.0f;
+		float maxRadiusZ = 200.0f;
+		vec3 randomPos(0.0f, 0.0f, 0.0f);
+		randomPos.x = (float)SymmetricRandom() * maxRadiusX;
+		randomPos.z = (float)SymmetricRandom() * maxRadiusZ;
+		mTreePos[i] = randomPos;
+	}
