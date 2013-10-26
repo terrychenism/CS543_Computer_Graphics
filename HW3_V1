@@ -317,7 +317,7 @@ void drawpic(int picnum)
 void drawtree(int num )
 {
 	Lsysnum=num;
-	mat4 viewMat = LookAt( vec4(0,0,200,1), vec4(0,0,0,1), vec4(0,1,0,0) );
+	mat4 viewMat = LookAt( vec4(0,0,300,1), vec4(0,0,0,1), vec4(0,1,0,0) );
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
 	mat4 modelMat;
 	for(int i = 0; i < element[Lsysnum].count; i++ )
@@ -347,8 +347,11 @@ void display( )
 {
 
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
-	for (Lsysnum = 0; Lsysnum < 5; Lsysnum++){
+	//for (int i = 0; i < 15; i++){
 
+		for (Lsysnum = 0; Lsysnum < 5; Lsysnum++){	
+		//Lsysnum=int(random(0,4));
+	
 		drawtree(Lsysnum);
 			
 	}				
@@ -770,7 +773,7 @@ struct TurtleState
 void generatelinetree(int Lsysnum)
 {
 	std::vector<TurtleState> stateStack;
-	vec4 currentposition /*= randomPoint(-70.0f,70.0f)*/;
+	vec4 currentposition;
 	vec4 currentdirection;
 	currentdirection.x = 0.0f;
 	currentdirection.y = 1.0f;
@@ -786,16 +789,16 @@ void generatelinetree(int Lsysnum)
 				currentposition = randomPoint(-30.0f,30.0f);
 				break;
 			case 1:
-				currentposition = randomPoint(-80.0f,80.0f);
+				currentposition = randomPoint(30.0f,50.0f);
 				break;
 			case 2:
-				currentposition = randomPoint(-100.0f,100.0f);
+				currentposition = randomPoint(50.0f,80.0f);
 				break;
 			case 3:
-				currentposition = randomPoint(-30.0f,30.0f);
+				currentposition = randomPoint(80.0f,90.0f);
 				break;
 			case 4:
-				currentposition = randomPoint(-100.0f,100.0f);
+				currentposition = randomPoint(90.0f,100.0f);
 				break;
 			}
 
