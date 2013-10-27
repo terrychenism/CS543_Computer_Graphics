@@ -31,13 +31,13 @@ vec4 iColor;
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
 
-vec4 points[4] = {
-    point4( -10,0,-28, 1.0 ),
-    point4( -10,0,14, 1.0 ),
-    point4( 10,0,14,1.0 ),
-    point4( 10,0,-28, 1.0 )
-
-};
+//vec4 points[4] = {
+//    point4( -10,0,-50, 1.0 ),
+//    point4( -10,0,14, 1.0 ),
+//    point4( 10,0,14,1.0 ),
+//    point4( 10,0,-50, 1.0 )
+//
+//};
 
 float stepX=0,stepY=0,stepZ=0;
 // remember to prototype
@@ -187,8 +187,22 @@ void drawGround(){
 
 	GLuint buffer1; 
     glGenBuffers( 1, &buffer1 );
+	//vec4 points[4];
+	//for(int i=0;i<1;i++)
+	//{
+	//	points[i]=point4( -10, 0,-50, 1.0 );
+	//	points[i+1]=point4( -10, 0,14, 1.0 );
+	//	points[i+2]=point4( 10, 0,14, 1.0 );
+	//	points[i+3]=point4( 10, 0,-50, 1.0 );
+	//}
 
+	vec4 points[4] = {
+    point4( -10,0,-50, 1.0 ),
+    point4( -10,0,14, 1.0 ),
+    point4( 10,0,14,1.0 ),
+    point4( 10,0,-50, 1.0 )
 
+};
 	vec4 colors[4] = {
 	color4( 1.0, 0.0, 0.0, 1.0 ),  // red
    color4( 0.0, 1.0, 0.0, 1.0 ),  // red
@@ -326,9 +340,11 @@ void display()
 	mat4 modelMatCar = modelMat;
 	mat4 modelMatPlane = modelMat;
 	mat4 modelMatGround = modelMat;
+
+
 	if(keyboardState == false)
 	{
-		element[iTreeNum].currentposition.x = randomPoint(-50.0f,50.0f).x;
+		element[iTreeNum].currentposition.x = randomPoint(0.0f,0.0f).x;
 		element[iTreeNum].currentposition.y = randomPoint(-200.0f,200.0f).y;
 		element[iTreeNum].currentposition.z = randomPoint(-50.0f,50.0f).z;
 		generatelinetree(iTreeNum);
@@ -437,7 +453,7 @@ void display()
 	glUniformMatrix4fv( modelMatrixCar, 1, GL_TRUE, m1 );	
 	drawpic(2);
 
-	modelMatPlane = modelMatPlane* Angel::Scale(2,2,2)*Angel::RotateX(15.0f)* Angel::Translate(-10,20,0);
+	modelMatPlane = modelMatPlane* Angel::Scale(2,2,2)*Angel::RotateX(15.0f)* Angel::Translate(-15,20,0);
 	mat4 m3= viewMat * modelMatPlane;
 	GLuint modelMatrixPlane = glGetUniformLocationARB(program, "model_matrix");
 	glUniformMatrix4fv( modelMatrixPlane, 1, GL_TRUE, m3 );	
