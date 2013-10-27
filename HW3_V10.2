@@ -23,7 +23,7 @@ bool scaleaction=true;
 bool normalaction=true;
 bool boundaction=true;
 bool pulsingaction=true;
-bool keyboardState=true;
+bool keyboardState=false;
 int numclick=0;
 int Lsysnum=0;
 int iTreeNum=0;
@@ -314,7 +314,7 @@ void drawpic(int picnum)
 	glDisable( GL_DEPTH_TEST ); 
 }
 
-void display( )
+void display()
 {
 	
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
@@ -431,7 +431,7 @@ void display( )
 
 	}
 	
-	modelMatCar = modelMatCar* Angel::Scale(2,2,2)*Angel::RotateX(15.0f)* Angel::Translate(20,0,0);
+	modelMatCar = modelMatCar* Angel::Scale(2,2,2)*Angel::RotateX(-10.0f)* Angel::Translate(20,0,0);
 	mat4 m1 = viewMat * modelMatCar;
 	GLuint modelMatrixCar = glGetUniformLocationARB(program, "model_matrix");
 	glUniformMatrix4fv( modelMatrixCar, 1, GL_TRUE, m1 );	
@@ -493,6 +493,11 @@ void keyboard( unsigned char key, int x, int y )
 	case 'e':
 		//keyboardState=true;
 		iTreeNum=4;
+		display();
+		break;
+	case 'f':
+		keyboardState=true;
+
 		display();
 		break;
 	}
