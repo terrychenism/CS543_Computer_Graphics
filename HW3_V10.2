@@ -23,7 +23,7 @@ bool scaleaction=true;
 bool normalaction=true;
 bool boundaction=true;
 bool pulsingaction=true;
-bool keyboardState=false;
+bool keyboardState=true;
 int numclick=0;
 int Lsysnum=0;
 int iTreeNum=0;
@@ -231,7 +231,7 @@ vec4 randomPoint( float min, float max)
     
         
                 point.x = GLfloat(random(min,max));
-				point.y = -50.0f;
+				point.y = 0.0f;
                 point.z = GLfloat(random(min,max));       
         
      return point;
@@ -288,7 +288,7 @@ void drawpic(int picnum)
 			picture[i].colors[u*3+2]=iColor.z;
 
 		}
-		glGenBuffers( 1, &picture[i].m_VBO );
+		//glGenBuffers( 1, &picture[i].m_VBO );
 		glBindBuffer( GL_ARRAY_BUFFER, picture[i].m_VBO );
 		//glBufferData( GL_ARRAY_BUFFER, sizeof(float)*picture[i].numvertex*3, picture[i].Vertex_Buffer, GL_STATIC_DRAW );
 		glBufferData( GL_ARRAY_BUFFER, sizeof(float)*picture[i].numvertex*3 + sizeof(float)*picture[i].numvertex*3, NULL, GL_STATIC_DRAW );
@@ -326,10 +326,43 @@ void display( )
 	mat4 modelMatCar = modelMat;
 	mat4 modelMatPlane = modelMat;
 	mat4 modelMatGround = modelMat;
+	if(keyboardState == false)
+	{
+		element[iTreeNum].currentposition.x = randomPoint(-1000.0f,1000.0f).x;
+		element[iTreeNum].currentposition.y = randomPoint(-200.0f,200.0f).y;
+		element[iTreeNum].currentposition.z = randomPoint(-50.0f,50.0f).z;
+		generatelinetree(iTreeNum);
+
+		
+				for(int i = 0; i < element[iTreeNum].count; i++ )
+						{	
+						
+					
+								modelMat = Angel::Translate(0,0,-ztrans ) ;
+
+								modelMat = element[iTreeNum].rotateMat[i] * modelMat;
+					
+								modelMat = Angel::Translate(element[iTreeNum].PointoDraw[i].x,element[iTreeNum].PointoDraw[i].y,element[iTreeNum].PointoDraw[i].z) * modelMat;
+					
+						
+										
+								// set up projection matricies
+								mat4 m = viewMat * modelMat;
+								GLuint modelMatrix = glGetUniformLocationARB(program, "model_matrix");
+								glUniformMatrix4fv( modelMatrix, 1, GL_TRUE, m );
+								drawpic(0);
+								drawpic(1);
+							
+
+						}	
+				
+			}	
+	else{
 
 			int count=0;
 			for (int i = 1; i <= 10; i++)
 			{
+
 				count++;
 				cout<<count<<endl;
 
@@ -396,7 +429,7 @@ void display( )
 				
 			}	
 
-
+	}
 	
 	modelMatCar = modelMatCar* Angel::Scale(2,2,2)*Angel::RotateX(15.0f)* Angel::Translate(20,0,0);
 	mat4 m1 = viewMat * modelMatCar;
@@ -417,9 +450,6 @@ void display( )
 	drawGround();
 	
 	
-		
-
-
 	GLuint projectionMatrix = glGetUniformLocationARB(program, "projection_matrix");
 	glUniformMatrix4fv( projectionMatrix, 1, GL_TRUE, perspectiveMat);
 	
@@ -441,138 +471,33 @@ void keyboard( unsigned char key, int x, int y )
         break;
 
 	case 'a':
-		keyboardState=true;
+		//keyboardState=true;
 		iTreeNum=0;
 		display();
 		break;
 	case 'b':
-		keyboardState=true;
+		//keyboardState=true;
 		iTreeNum=1;
 		display();
 		break;
 	case 'c':
-		keyboardState=true;
+		//keyboardState=true;
 		iTreeNum=2;
 		display();
 		break;
 	case 'd':
-		keyboardState=true;
+		//keyboardState=true;
 		iTreeNum=3;
 		display();
 		break;
 	case 'e':
-		keyboardState=true;
+		//keyboardState=true;
 		iTreeNum=4;
 		display();
 		break;
 	}
 
-	/*case 'W':
-		keyboard_value='W';
-		numclick=1; 
-		stepX=0;
-		stepY=0;
-		stepZ=0;
-		display();
-		break;
-	case 'N':
-		stepX=0;
-		stepY=0;
-		stepZ=0;
-		keyboard_value='N';
-		numclick++; 
-		if(numclick==2){
-			numclick=0;
-		}
-		display();
-		break;
-	case 'P':
-		keyboard_value='P';
-		numclick--; 
-		if(numclick==-1){
-			numclick=1;
-		}
-		display();
-		break;
-	case 'X':
-		if(keyboard_value=='R')
-		{
-			break;
-		}
-		keyboard_value='X';
-		Xaction=!Xaction;
-		idle();
-		break;		
-	case 'x':
-		if(keyboard_value=='R')
-		{
-			break;
-		}
-		xaction=!xaction;
-		keyboard_value='x';
-		idle();
-		break;	
-	case 'Y':
-		if(keyboard_value=='R')
-		{
-			break;
-		}
-		Yaction=!Yaction;
-		keyboard_value='Y';
-		idle();
-		break;		
-	case 'Z':
-		if(keyboard_value=='R')
-		{
-			break;
-		}
-		Zaction=!Zaction;
-		keyboard_value='Z';
-		idle();
-		break;	
-	case 'y':
-		if(keyboard_value=='R')
-		{
-			break;
-		}
-		yaction=!yaction;
-		keyboard_value='y';
-		idle();
-		break;		
-	case 'z':
-		if(keyboard_value=='R')
-		{
-			break;
-		}
-		zaction=!zaction;
-		keyboard_value='z';
-		idle();
-		break;	
-    
-	case 'R':
-		if(keyboard_value=='X'||keyboard_value=='x'||keyboard_value=='Y'||keyboard_value=='y'||keyboard_value=='Z'||keyboard_value=='z')
-		{
-			break;
-		}
-		keyboard_value='R';
-		rotateaction=!rotateaction;
-		idle();
-		break;
-	case 'B':
-		keyboard_value='B';
-
-		idle();
-		break;
-	case 'm':
-		keyboard_value='m';
-		normalaction=!normalaction;
-		display();
-		break;
-	case 'e':
-		keyboard_value='e';
-		boundaction=!boundaction;
-		display();
-		break;*/
+	
 		
 }
 
