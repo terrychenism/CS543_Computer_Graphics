@@ -328,7 +328,7 @@ void display()
 	mat4 modelMatGround = modelMat;
 	if(keyboardState == false)
 	{
-		element[iTreeNum].currentposition.x = randomPoint(-1000.0f,1000.0f).x;
+		element[iTreeNum].currentposition.x = randomPoint(-50.0f,50.0f).x;
 		element[iTreeNum].currentposition.y = randomPoint(-200.0f,200.0f).y;
 		element[iTreeNum].currentposition.z = randomPoint(-50.0f,50.0f).z;
 		generatelinetree(iTreeNum);
@@ -437,7 +437,7 @@ void display()
 	glUniformMatrix4fv( modelMatrixCar, 1, GL_TRUE, m1 );	
 	drawpic(2);
 
-	modelMatPlane = modelMatPlane* Angel::Scale(2,2,2)*Angel::RotateX(15.0f)* Angel::Translate(-20,0,0);
+	modelMatPlane = modelMatPlane* Angel::Scale(2,2,2)*Angel::RotateX(15.0f)* Angel::Translate(-10,20,0);
 	mat4 m3= viewMat * modelMatPlane;
 	GLuint modelMatrixPlane = glGetUniformLocationARB(program, "model_matrix");
 	glUniformMatrix4fv( modelMatrixPlane, 1, GL_TRUE, m3 );	
