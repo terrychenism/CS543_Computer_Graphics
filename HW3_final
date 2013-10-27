@@ -23,7 +23,7 @@ bool scaleaction=true;
 bool normalaction=true;
 bool boundaction=true;
 bool pulsingaction=true;
-bool keyboardState=false;
+int keyboardState=2;
 int numclick=0;
 int Lsysnum=0;
 int iTreeNum=0;
@@ -31,13 +31,7 @@ vec4 iColor;
 typedef Angel::vec4  color4;
 typedef Angel::vec4  point4;
 
-//vec4 points[4] = {
-//    point4( -10,0,-50, 1.0 ),
-//    point4( -10,0,14, 1.0 ),
-//    point4( 10,0,14,1.0 ),
-//    point4( 10,0,-50, 1.0 )
-//
-//};
+
 
 float stepX=0,stepY=0,stepZ=0;
 // remember to prototype
@@ -187,14 +181,6 @@ void drawGround(){
 
 	GLuint buffer1; 
     glGenBuffers( 1, &buffer1 );
-	//vec4 points[4];
-	//for(int i=0;i<1;i++)
-	//{
-	//	points[i]=point4( -10, 0,-50, 1.0 );
-	//	points[i+1]=point4( -10, 0,14, 1.0 );
-	//	points[i+2]=point4( 10, 0,14, 1.0 );
-	//	points[i+3]=point4( 10, 0,-50, 1.0 );
-	//}
 
 	vec4 points[4] = {
     point4( -10,0,-50, 1.0 ),
@@ -203,17 +189,19 @@ void drawGround(){
     point4( 10,0,-50, 1.0 )
 
 };
-	vec4 colors[4] = {
+
+	vec4 colors[8] = {
 	color4( 1.0, 0.0, 0.0, 1.0 ),  // red
    color4( 0.0, 1.0, 0.0, 1.0 ),  // red
 
    color4( 0.0, 0.0, 1.0, 1.0 ),  // red
-    color4( 1.0, 0.5, 0.5, 1.0 )  // red
+    color4( 1.0, 0.5, 0.5, 1.0 )
 };
 
 
 
     glBindBuffer( GL_ARRAY_BUFFER, buffer1 );
+	//glBufferData( GL_ARRAY_BUFFER,sizeof(points), points, GL_STATIC_DRAW );
     glBufferData( GL_ARRAY_BUFFER,sizeof(points) + sizeof(colors), NULL, GL_STATIC_DRAW );
 	glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(points), points );
     glBufferSubData( GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors );
@@ -272,7 +260,7 @@ void generateGeometry( void )
 
 
 
-    glClearColor( 0.0,0.0,0.0, 1.0 ); // white background
+    glClearColor( 1.0, 1.0,1.0,1.0 ); // white background
 }
 
 void drawCube(void)
@@ -328,10 +316,11 @@ void drawpic(int picnum)
 	glDisable( GL_DEPTH_TEST ); 
 }
 
+
 void display()
 {
-	
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
+
 	mat4 viewMat = LookAt( vec4(0,30,100,1), vec4(0,0,0,1), vec4(0,1,0,0) );
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
 	mat4 modelMat;
@@ -340,13 +329,11 @@ void display()
 	mat4 modelMatCar = modelMat;
 	mat4 modelMatPlane = modelMat;
 	mat4 modelMatGround = modelMat;
-
-
-	if(keyboardState == false)
+	if(keyboardState == 0)
 	{
-		element[iTreeNum].currentposition.x = randomPoint(0.0f,0.0f).x;
-		element[iTreeNum].currentposition.y = randomPoint(-200.0f,200.0f).y;
-		element[iTreeNum].currentposition.z = randomPoint(-50.0f,50.0f).z;
+		element[iTreeNum].currentposition.x = 0;
+		element[iTreeNum].currentposition.y = -10;
+		element[iTreeNum].currentposition.z = 0;
 		generatelinetree(iTreeNum);
 
 		
@@ -360,8 +347,6 @@ void display()
 					
 								modelMat = Angel::Translate(element[iTreeNum].PointoDraw[i].x,element[iTreeNum].PointoDraw[i].y,element[iTreeNum].PointoDraw[i].z) * modelMat;
 					
-						
-										
 								// set up projection matricies
 								mat4 m = viewMat * modelMat;
 								GLuint modelMatrix = glGetUniformLocationARB(program, "model_matrix");
@@ -373,7 +358,38 @@ void display()
 						}	
 				
 			}	
-	else{
+	else if (keyboardState == 3){
+		iTreeNum=int(random(0,4));
+		iColor.x =  float(random(0,1));
+		iColor.y =  float(random(0,1));
+		iColor.z =  float(random(0,1));
+		element[iTreeNum].currentposition.x = randomPoint(-50.0f,50.0f).x;
+		element[iTreeNum].currentposition.y = randomPoint(-200.0f,200.0f).y;
+		element[iTreeNum].currentposition.z = randomPoint(-50.0f,50.0f).z;
+		generatelinetree(iTreeNum);
+
+						for(int i = 0; i < element[iTreeNum].count; i++ )
+						{	
+						
+					
+								modelMat = Angel::Translate(0,0,-ztrans ) ;
+
+								modelMat = element[iTreeNum].rotateMat[i] * modelMat;
+					
+								modelMat = Angel::Translate(element[iTreeNum].PointoDraw[i].x,element[iTreeNum].PointoDraw[i].y,element[iTreeNum].PointoDraw[i].z) * modelMat;
+
+								// set up projection matricies
+								mat4 m = viewMat * modelMat;
+								GLuint modelMatrix = glGetUniformLocationARB(program, "model_matrix");
+								glUniformMatrix4fv( modelMatrix, 1, GL_TRUE, m );
+								drawpic(0);
+								drawpic(1);
+							
+
+						}	
+	}
+
+	else if (keyboardState == 1){
 
 			int count=0;
 			for (int i = 1; i <= 10; i++)
@@ -430,9 +446,7 @@ void display()
 								modelMat = element[iTreeNum].rotateMat[i] * modelMat;
 					
 								modelMat = Angel::Translate(element[iTreeNum].PointoDraw[i].x,element[iTreeNum].PointoDraw[i].y,element[iTreeNum].PointoDraw[i].z) * modelMat;
-					
-						
-										
+	
 								// set up projection matricies
 								mat4 m = viewMat * modelMat;
 								GLuint modelMatrix = glGetUniformLocationARB(program, "model_matrix");
@@ -445,7 +459,7 @@ void display()
 				
 			}	
 
-	}
+	
 	
 	modelMatCar = modelMatCar* Angel::Scale(2,2,2)*Angel::RotateX(-10.0f)* Angel::Translate(20,0,0);
 	mat4 m1 = viewMat * modelMatCar;
@@ -453,7 +467,7 @@ void display()
 	glUniformMatrix4fv( modelMatrixCar, 1, GL_TRUE, m1 );	
 	drawpic(2);
 
-	modelMatPlane = modelMatPlane* Angel::Scale(2,2,2)*Angel::RotateX(15.0f)* Angel::Translate(-15,20,0);
+	modelMatPlane = modelMatPlane* Angel::Scale(2,2,2)*Angel::RotateX(15.0f)* Angel::Translate(-10,20,0);
 	mat4 m3= viewMat * modelMatPlane;
 	GLuint modelMatrixPlane = glGetUniformLocationARB(program, "model_matrix");
 	glUniformMatrix4fv( modelMatrixPlane, 1, GL_TRUE, m3 );	
@@ -464,7 +478,7 @@ void display()
 	GLuint modelMatrixGround = glGetUniformLocationARB(program, "model_matrix");
 	glUniformMatrix4fv( modelMatrixGround, 1, GL_TRUE, m2 );	
 	drawGround();
-	
+	}
 	
 	GLuint projectionMatrix = glGetUniformLocationARB(program, "projection_matrix");
 	glUniformMatrix4fv( projectionMatrix, 1, GL_TRUE, perspectiveMat);
@@ -487,32 +501,38 @@ void keyboard( unsigned char key, int x, int y )
         break;
 
 	case 'a':
-		//keyboardState=true;
+		keyboardState = 0;
 		iTreeNum=0;
 		display();
 		break;
 	case 'b':
-		//keyboardState=true;
+		
+		keyboardState = 0;
 		iTreeNum=1;
 		display();
 		break;
 	case 'c':
-		//keyboardState=true;
+		keyboardState = 0;
 		iTreeNum=2;
 		display();
 		break;
 	case 'd':
-		//keyboardState=true;
+		keyboardState = 0;
 		iTreeNum=3;
 		display();
 		break;
 	case 'e':
-		//keyboardState=true;
+		keyboardState = 0;
 		iTreeNum=4;
 		display();
 		break;
 	case 'f':
-		keyboardState=true;
+		keyboardState=1;
+
+		display();
+		break;
+	case 'r':
+		keyboardState=3;
 
 		display();
 		break;
