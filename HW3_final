@@ -319,8 +319,12 @@ void drawpic(int picnum)
 
 void display()
 {
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
-
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );     // clear the window
+	if (keyboardState == 3){
+		 
+	
+		 glutSwapBuffers();
+	}
 	mat4 viewMat = LookAt( vec4(0,30,100,1), vec4(0,0,0,1), vec4(0,1,0,0) );
 	Angel::mat4 perspectiveMat = Angel::Perspective((GLfloat)60.0, (GLfloat)width/(GLfloat)height, (GLfloat)0.1, (GLfloat) 9998.0);
 	mat4 modelMat;
@@ -387,6 +391,12 @@ void display()
 							
 
 						}	
+	modelMatGround= Angel::Scale(5,5,5)*modelMatGround; 
+	mat4 m2 = viewMat * modelMatGround;
+	GLuint modelMatrixGround = glGetUniformLocationARB(program, "model_matrix");
+	glUniformMatrix4fv( modelMatrixGround, 1, GL_TRUE, m2 );	
+	drawGround();
+	
 	}
 
 	else if (keyboardState == 1){
@@ -496,11 +506,13 @@ void keyboard( unsigned char key, int x, int y )
 {
 	
     switch ( key ) {
+
     case 033:
         exit( EXIT_SUCCESS );
         break;
 
 	case 'a':
+		//glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 		keyboardState = 0;
 		iTreeNum=0;
 		display();
