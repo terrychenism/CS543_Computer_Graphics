@@ -1,0 +1,92 @@
+#include<iostream>
+using namespace std;
+int H[]={0,16,4,10,14,7,9,3,2,8,1};
+
+void swap(int &a,int &b){
+	int t = a;
+	a = b;
+	b = t;
+}
+void siftUp(int H[] ,int i)
+{
+	while(i > 1 && (H[i]>H[i/2]))
+	{
+		swap(H[i],H[i/2]);
+		i=i/2;
+	}
+}
+
+void siftDown(int H[] ,int i ,int n) // The text calls this HEAPIFY.
+{	
+	int j, r = i; // r is the moving address.
+	while (2*r <= n) // repeat until hitting bottom. . .
+	{ 
+		j = 2*r; // now to ﬁnd the larger child of H[r]
+		if (j < n && H[j] < H[j + 1]) 
+		//	max=H[j + 1];
+		//else max = H[j];
+			j++;
+		if (H[j] <= H[r]) 
+			return;
+		else
+			swap(H[j], H[r]); 
+		//swap(max, H[r]); 
+			r = j;
+	}
+	
+}
+
+
+
+void sloppySiftDown(int H[] ,int i ,int n)
+{
+	int j, r = i; // r is the moving address.
+	int max;
+	while (2*r <= n) // repeat until hitting bottom. . .
+	{ 
+		j = 2*r; // now to ﬁnd the larger child of H[r]
+		if (j < n && H[j] < H[j + 1]) 
+			j++;
+		swap(H[j],H[r]);
+		r=j;
+	}
+	siftUp(H,r);
+}
+void buildheap(int H[],int n){
+for (int i = n / 2; i >= 1; i--) // Loop starts at ⌊n/2⌋
+	{
+		sloppySiftDown(H,i,n);
+
+	}
+}
+void HeapSort (int H[], int n)
+{ 
+	int hsize = n;
+	buildheap(H,n);
+	for (; hsize >= 2; hsize--)
+	
+	{
+		swap(H[hsize], H[1]); // move H[1] to its sorted place
+		sloppySiftDown(H, 1, hsize - 1);
+		//siftDown(H, 1, hsize - 1); // Repair the heap, make H[1] largest in its fragment
+		
+	}
+}
+
+int main(){
+
+	for(int i = 1;i < 11;i++){
+		cout<<H[i] << " ";  
+	}
+	cout<<endl;  
+	
+	HeapSort(H,10);
+	
+	for(int i=1; i < 11; i++){
+		cout<< H[i] << " ";  
+	}
+    cout<<endl;  
+
+	getchar();
+	return 0;
+}
