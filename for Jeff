@@ -1,0 +1,27 @@
+				switch (iTreeNum){
+					case 0:
+						element[iTreeNum].currentposition.x = randomPoint(-1000.0f,1000.0f).x;
+						element[iTreeNum].currentposition.y = randomPoint(-200.0f,200.0f).y;
+						element[iTreeNum].currentposition.z = randomPoint(-50.0f,50.0f).z;
+						break;
+					case 1:
+						element[iTreeNum].currentposition.x = randomPoint(-1000.0f,0.0f).x;
+						element[iTreeNum].currentposition.y = randomPoint(-200.0f,200.0f).y;
+						element[iTreeNum].currentposition.z = randomPoint(-50.0f,50.0f).z;
+						break;
+					case 2:
+						element[iTreeNum].currentposition.x = randomPoint(-50.0f,10.0f).x;
+						element[iTreeNum].currentposition.y = randomPoint(-200.0f,200.0f).y;
+						element[iTreeNum].currentposition.z = randomPoint(-50.0f,50.0f).z;
+						break;
+					case 3:
+						element[iTreeNum].currentposition.x = randomPoint(-150.0f,10.0f).x;
+						element[iTreeNum].currentposition.y = randomPoint(-200.0f,200.0f).y;
+						element[iTreeNum].currentposition.z = randomPoint(-50.0f,50.0f).z;
+						break;
+					case 4:
+						element[iTreeNum].currentposition.x = randomPoint(-300.0f,10.0f).x;
+						element[iTreeNum].currentposition.y = randomPoint(-200.0f,200.0f).y;
+						element[iTreeNum].currentposition.z = randomPoint(-50.0f,50.0f).z;
+						break;
+					}
