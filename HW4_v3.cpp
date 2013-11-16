@@ -639,7 +639,7 @@ void display()
 	//---------------------
 
 	//-----draw car-------------
-	modelMatCar = modelMatCar* Angel::Scale(5,5,5)*Angel::RotateX(-10.0f)* Angel::Translate(5,0,0);
+	modelMatCar = modelMatCar* Angel::Scale(4,4,4)*Angel::RotateX(-10.0f)* Angel::Translate(5,0,0);
 	mat4 m1 = viewMat * modelMatCar;
 	GLuint modelMatrixCar = glGetUniformLocationARB(program, "model_matrix");
 	glUniformMatrix4fv( modelMatrixCar, 1, GL_TRUE, m1 );	
