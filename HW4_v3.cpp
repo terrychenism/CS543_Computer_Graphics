@@ -112,12 +112,12 @@ vec4 points[6] = {
 
 void Ground(){
 	
-	tex_coords[0] = vec2( 0.0, 16.0 );
+	tex_coords[0] = vec2( 0.0, 10.0 );
 	tex_coords[1] = vec2( 0.0, 0.0 );
-	tex_coords[2] = vec2( 16.0, 0.0 );
-	tex_coords[3] = vec2( 16.0, 0.0 );
-	tex_coords[4] = vec2( 16.0, 16.0 );
-	tex_coords[5] = vec2( 0.0, 16.0 );
+	tex_coords[2] = vec2( 10.0, 0.0 );
+	tex_coords[3] = vec2( 10.0, 0.0 );
+	tex_coords[4] = vec2( 10.0, 10.0 );
+	tex_coords[5] = vec2( 0.0, 10.0 );
 
 	 }	
 
@@ -159,9 +159,9 @@ void init( void )
     glBindVertexArray( t_vao );
 
     // Create and initialize a buffer object
-    GLuint buffer1;
-    glGenBuffers( 1, &buffer1 );
-    glBindBuffer( GL_ARRAY_BUFFER, buffer1 );
+    GLuint buffer10;
+    glGenBuffers( 1, &buffer10 );
+    glBindBuffer( GL_ARRAY_BUFFER, buffer10 );
 
 
 
@@ -623,22 +623,6 @@ void display()
 				
 			}	
 
-
-
-	//-----draw car-------------
-	modelMatCar = modelMatCar* Angel::Scale(2,2,2)*Angel::RotateX(-10.0f)* Angel::Translate(20,0,0);
-	mat4 m1 = viewMat * modelMatCar;
-	GLuint modelMatrixCar = glGetUniformLocationARB(program, "model_matrix");
-	glUniformMatrix4fv( modelMatrixCar, 1, GL_TRUE, m1 );	
-	drawpic(2);
-
-	//------draw car shadow------
-	viewMat_Car  = viewMat_Car * Translate(light[0],light[1], light[2])*mlight*Translate(-light[0],-light[1],-light[2]); 
-	mat4 mm1 = viewMat_Car * modelMatCar;
-	GLuint modelMatrixShadowCar = glGetUniformLocationARB(program, "model_matrix");
-	glUniformMatrix4fv( modelMatrixShadowCar, 1, GL_TRUE, mm1 );	
-	drawpic(2);
-
 	//------draw plane-------
 	modelMatPlane = modelMatPlane* Angel::Scale(2,2,2)*Angel::RotateX(15.0f)* Angel::Translate(-10,20,0);
 	mat4 m3= viewMat * modelMatPlane;
@@ -653,6 +637,22 @@ void display()
 	glUniformMatrix4fv( modelMatrixShadowPlane, 1, GL_TRUE, mm3 );	
 	drawpic(3);
 	//---------------------
+
+	//-----draw car-------------
+	modelMatCar = modelMatCar* Angel::Scale(5,5,5)*Angel::RotateX(-10.0f)* Angel::Translate(5,0,0);
+	mat4 m1 = viewMat * modelMatCar;
+	GLuint modelMatrixCar = glGetUniformLocationARB(program, "model_matrix");
+	glUniformMatrix4fv( modelMatrixCar, 1, GL_TRUE, m1 );	
+	drawpic(2);
+
+	//------draw car shadow------
+	viewMat_Car  = viewMat_Car * Translate(light[0],light[1], light[2])*mlight*Translate(-light[0],-light[1],-light[2]); 
+	mat4 mm1 = viewMat_Car * modelMatCar;
+	GLuint modelMatrixShadowCar = glGetUniformLocationARB(program, "model_matrix");
+	glUniformMatrix4fv( modelMatrixShadowCar, 1, GL_TRUE, mm1 );	
+	drawpic(2);
+
+
 
 	//------draw ground-------
 	modelMatGround= Angel::Scale(5,5,5)*modelMatGround; 
@@ -1411,8 +1411,8 @@ int main( int argc, char **argv )
     glewInit();
 	ReadPlyFile("sphere.ply",0);
 	ReadPlyFile("cylinder.ply",1);
-	//ReadPlyFile("big_dodge.ply",2);
-	ReadPlyFile("pickup_big.ply",2);
+	ReadPlyFile("big_dodge.ply",2);
+	//ReadPlyFile("pickup_big.ply",2);
 	ReadPlyFile("f16.ply",3);
 	/*ReadPlyFile("weathervane.ply",0);
 	ReadPlyFile("airplane.ply",1);
@@ -1462,7 +1462,7 @@ int main( int argc, char **argv )
 	
 	generateGeometry();
 
-	init();
+	//init();
     
 
 	// assign handlers
