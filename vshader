@@ -6,9 +6,13 @@ uniform vec3 face_normal;
 uniform float step;
 uniform bool pulsing;
 
+in  vec4 vTexCoord;
 in  vec4 vPosition;
 in  vec4 vColor;
 out vec4 interpolatedColor;
+out vec2 texCoord;
+out vec4 Position;
+
 
 void main() 
 {
@@ -20,13 +24,11 @@ void main()
   else
   {
 	gl_Position = projection_matrix*model_matrix*vPosition;
+	//gl_Position = projection_matrix*vPosition;
   }
+  texCoord = vTexCoord.st;
 
-  if(vColor==vec4(0.0,0.0,0.0,1.0))
-	 {
-		interpolatedColor=vec4(0.0,1.0,0.0,1.0);
-	}
-  else{
-		interpolatedColor = vColor;
-		}
+  interpolatedColor = vColor;
+
+  Position = gl_Position; 
 } 
