@@ -2,8 +2,12 @@
 
 uniform sampler2D texture;
 uniform bool groundOn;
+uniform bool cubeOn;
 uniform bool fogOn;
+uniform bool shadowOn;
+uniform samplerCube texMap;
 
+in vec3 R;
 in  vec4  interpolatedColor;
 in  vec2 texCoord;
 in  vec4 Position ;
@@ -12,15 +16,40 @@ out vec4  fColor;
 
 void main() 
 { 
-
 	
 
+
+
+
 	if ( groundOn ) 
-		fColor = texture2D( texture, texCoord );
-	else
 	{
-		fColor = interpolatedColor;	
+		fColor = texture2D( texture, texCoord );
 	}
+	else 
+	{
+		if(shadowOn){
+			fColor = vec4(0.0, 0.0,0.0,1.0);
+		}
+		else if (cubeOn)
+		{
+			fColor = textureCube(texMap, R);
+		}
+		else {
+			fColor = interpolatedColor;	
+		}
+
+	}
+
+	//if(cubeOn)
+	//{
+		//fColor = textureCube(texMap, R);
+	//}
+	//else 
+	//{
+		//fColor = interpolatedColor;	
+	//}
+
+
 
 	if (fogOn){
 		float dist = abs(Position.z);
@@ -28,5 +57,7 @@ void main()
 		fogFactor = clamp(fogFactor, 0.0, 1.0);
 		fColor = mix(vec4(1.0, 1.0,1.0,1.0), fColor,fogFactor);
 	}
+	//fColor = vec4(1.0, 0.0,0.0,1.0);
+	//fColor = textureCube(texMap, R);
 } 
 
