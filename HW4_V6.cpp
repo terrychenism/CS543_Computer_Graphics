@@ -654,8 +654,7 @@ void drawRefPic(int picnum)
 
 
     glClearColor( 1.0, 1.0, 1.0, 1.0 ); // white background
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-	glEnable( GL_DEPTH_TEST );
+
 	//glBindBuffer( GL_ARRAY_BUFFER, picture[picnum].m_VBO );
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,  picture[picnum].m_IBO );
 	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
@@ -666,6 +665,13 @@ void drawRefPic(int picnum)
     glEnableVertexAttribArray( vNormal );
     glVertexAttribPointer( vNormal, 3, GL_FLOAT, GL_FALSE, 0,
 			   BUFFER_OFFSET(sizeof(float)*picture[picnum].numvertex*3));
+
+	texMapLocation = glGetUniformLocation(program, "texMap");
+    glUniform1i(texMapLocation, 1);
+
+	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
+    glEnable( GL_DEPTH_TEST );
+
 	glDrawElements( GL_TRIANGLES, picture[picnum].numface*3, GL_UNSIGNED_INT,  0);
 	glDisable( GL_DEPTH_TEST ); 
 }
@@ -921,7 +927,8 @@ void display()
 	mat4 m1 = viewMat * modelMatCar;
 	GLuint modelMatrixCar = glGetUniformLocationARB(program, "model_matrix");
 	glUniformMatrix4fv( modelMatrixCar, 1, GL_TRUE, m1 );	
-	drawpic(2);
+	//drawpic(2);
+	drawRefPic(2);
 
 	//------draw car shadow------
 	viewMat_Car  = viewMat_Car * Translate(light[0],light[1], light[2])*mlight*Translate(-light[0],-light[1],-light[2]); 
