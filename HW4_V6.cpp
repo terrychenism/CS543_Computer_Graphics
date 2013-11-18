@@ -369,36 +369,7 @@ double random(double start, double end)
 void reflection( void )
 {
 	bmpread_t bitmapnegx,bitmapnegy,bitmapnegz,bitmapposx,bitmapposy,bitmapposz;
-	//if(!bmpread("nvnegx.bmp", 0, &bitmapnegx))
- //                       {
- //                               fprintf(stderr, "%s:error loading bitmap file\n", "grass.bmp");
- //                               exit(1);
- //                       }
-	//if(!bmpread("nvnegy.bmp", 0, &bitmapnegy))
- //                       {
- //                               fprintf(stderr, "%s:error loading bitmap file\n", "grass.bmp");
- //                               exit(1);
- //                       }
-	//if(!bmpread("nvnegz.bmp", 0, &bitmapnegz))
- //                       {
- //                               fprintf(stderr, "%s:error loading bitmap file\n", "grass.bmp");
- //                               exit(1);
- //                       }
-	//if(!bmpread("nvposx.bmp", 0, &bitmapposx))
- //                       {
- //                               fprintf(stderr, "%s:error loading bitmap file\n", "grass.bmp");
- //                               exit(1);
- //                       }
-	//if(!bmpread("nvposy.bmp", 0, &bitmapposy))
- //                       {
- //                               fprintf(stderr, "%s:error loading bitmap file\n", "grass.bmp");
- //                               exit(1);
- //                       }
-	//if(!bmpread("nvposz.bmp", 0, &bitmapposz))
- //                       {
- //                               fprintf(stderr, "%s:error loading bitmap file\n", "grass.bmp");
- //                               exit(1);
- //                       }
+
 	bmpread("nvnegx.bmp", 0, &bitmapnegx);
 	bmpread("nvnegy.bmp", 0, &bitmapnegy);
 	bmpread("nvnegz.bmp", 0, &bitmapnegz);
@@ -410,17 +381,17 @@ void reflection( void )
 	glGenTextures(1,&tex); 
 	glBindTexture(GL_TEXTURE_CUBE_MAP,tex);
 
-	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X ,0,GL_RGB,1,1,0,GL_RGB,
+	glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X ,0,GL_RGB,512,512,0,GL_RGB,
         GL_UNSIGNED_BYTE, bitmapposx.rgb_data);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X ,0,GL_RGB,1,1,0,GL_RGB,
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X ,0,GL_RGB,512,512,0,GL_RGB,
         GL_UNSIGNED_BYTE, bitmapnegx.rgb_data);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y ,0,GL_RGB,1,1,0,GL_RGB,
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Y ,0,GL_RGB,512,512,0,GL_RGB,
         GL_UNSIGNED_BYTE, bitmapposy.rgb_data);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y ,0,GL_RGB,1,1,0,GL_RGB,
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Y ,0,GL_RGB,512,512,0,GL_RGB,
         GL_UNSIGNED_BYTE, bitmapnegy.rgb_data);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z ,0,GL_RGB,1,1,0,GL_RGB,
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_Z ,0,GL_RGB,512,512,0,GL_RGB,
         GL_UNSIGNED_BYTE, bitmapposz.rgb_data);
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z ,0,GL_RGB,1,1,0,GL_RGB,
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_Z ,0,GL_RGB,512,512,0,GL_RGB,
         GL_UNSIGNED_BYTE, bitmapnegz.rgb_data);
 
 
@@ -435,17 +406,6 @@ void reflection( void )
    glUniform1i(texMapLocation, 1); // corresponding to unit 1
 
 }
-
-//int Index = 0;
-//void quad( int a, int b, int c, int d )
-//{
-//    mcolors[Index] = vertex_colors[a]; mpoints[Index] = cube_vertices[a]; Index++;
-//    mcolors[Index] = vertex_colors[b]; mpoints[Index] = cube_vertices[b]; Index++;
-//    mcolors[Index] = vertex_colors[c]; mpoints[Index] = cube_vertices[c]; Index++;
-//    mcolors[Index] = vertex_colors[a]; mpoints[Index] = cube_vertices[a]; Index++;
-//    mcolors[Index] = vertex_colors[c]; mpoints[Index] = cube_vertices[c]; Index++;
-//    mcolors[Index] = vertex_colors[d]; mpoints[Index] = cube_vertices[d]; Index++;
-//}
 
 void quad(int a, int b, int c, int d)
 {
@@ -533,23 +493,6 @@ void generateGeometry( void )
 
     glClearColor( 1.0, 1.0,1.0,1.0 ); // white background
 }
-//void drawCube(void)
-//{
-//	//colorcube();
-//	glClearColor( 0.0, 0.0, 0.0, 1.0 ); // white background
-//	//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-//	glEnable( GL_DEPTH_TEST );
-//	//glBindBuffer( GL_ARRAY_BUFFER, picture[numclick].n_VBO );
-//	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,  picture[numclick].n_IBO );
-//	GLuint vPosition = glGetAttribLocation( program, "vPosition" );
-//	glEnableVertexAttribArray( vPosition );
-//	glVertexAttribPointer( vPosition, 3, GL_FLOAT, GL_FALSE, 0,
-//			   BUFFER_OFFSET(0) );	
-//	//glDrawArrays( GL_QUADS, 0, 24 );
-//	glDrawElements( GL_QUADS, 24, GL_UNSIGNED_INT,  0);//violation
-//	glDisable( GL_DEPTH_TEST ); 
-//}
-
 
 void drawCube(void)
 {
@@ -592,11 +535,11 @@ void drawCube(void)
 	//glActiveTexture(GL_TEXTURE1); 
 	//glBindTexture(GL_TEXTURE_CUBE_MAP,tex);
 	//glUniform1i(texMapLocation, 1);
-	GLuint vcubeOn = glGetUniformLocation( program, "cubeOn");
+	GLuint vRefOn = glGetUniformLocation( program, "refOn");
 	if ( reflectON == true )
-		glUniform1i (vcubeOn, true);
+		glUniform1i (vRefOn, true);
 	else
-		glUniform1i (vcubeOn, false);
+		glUniform1i (vRefOn, false);
 
 
 
@@ -605,6 +548,7 @@ void drawCube(void)
 	glDrawArrays( GL_TRIANGLES, 0, 36 );
 	glDisable( GL_DEPTH_TEST ); 
 }
+
 void drawpic(int picnum)
 {
 	int i= picnum;
@@ -639,6 +583,16 @@ void drawpic(int picnum)
     glEnableVertexAttribArray( vColor );
     glVertexAttribPointer( vColor, 3, GL_FLOAT, GL_FALSE, 0,
 			   BUFFER_OFFSET(sizeof(float)*picture[picnum].numvertex*3));
+
+
+	GLuint vRefOn = glGetUniformLocation( program, "refOn");
+	if ( reflectON == true )
+		glUniform1i (vRefOn, true);
+	else
+		glUniform1i (vRefOn, false);
+
+
+
 	glDrawElements( GL_TRIANGLES, picture[picnum].numface*3, GL_UNSIGNED_INT,  0);
 	glDisable( GL_DEPTH_TEST ); 
 }
@@ -912,7 +866,8 @@ void display()
 	mat4 m3= viewMat * modelMatPlane;
 	GLuint modelMatrixPlane = glGetUniformLocationARB(program, "model_matrix");
 	glUniformMatrix4fv( modelMatrixPlane, 1, GL_TRUE, m3 );	
-	drawpic(3);
+	//drawpic(3);
+	drawRefPic(3);
 
 	//------draw plane shadow------
 	viewMat_Plane = viewMat_Plane* Translate(light[0],light[1], light[2])*mlight*Translate(-light[0],-light[1],-light[2]); 
