@@ -6,6 +6,8 @@ uniform bool refOn;
 uniform bool fogOn;
 uniform bool shadowOn;
 uniform samplerCube texMap;
+uniform bool refractOn;
+uniform bool reflectOn;
 
 in vec3 R;
 in  vec4  interpolatedColor;
@@ -25,7 +27,12 @@ void main()
 	{
 		fColor = vec4(0.0, 0.0,0.0,1.0);	
 	}
-	else if( refOn )
+	else if( refractOn )
+	{
+		//fColor = textureCube(texMap, R);
+		fColor =  mix(textureCube(texMap, R),vec4(1.0, 1.0,1.0,1.0),0.3f);
+	}
+	else if( reflectOn )
 	{
 		fColor = textureCube(texMap, R);
 	}
