@@ -4,7 +4,8 @@ uniform mat4 projection_matrix;
 uniform mat4 model_matrix;
 uniform vec3 face_normal;
 uniform float step;
-uniform bool pulsing;
+uniform bool refractOn;
+uniform bool reflectOn;
 
 in  vec4 vTexCoord;
 in  vec4 vPosition;
@@ -17,18 +18,32 @@ out vec3 R;
 
 void main() 
 {
-  vec4 viewPos = model_matrix*vPosition;
-  //vex4 worldPos = world_matrix*vPosition;
- // viewPos = view_matrix*worldPos;
-  //gl_Position = projection_matrix*viewPos;
 
-  vec3 eyeDirection = viewPos.xyz;
-  // eyeDirection = normalize(eyeDirection);
-  vec4 viewN = model_matrix*Normal;
-  vec3 N = normalize(viewN.xyz);
-  R = reflect(eyeDirection, N);
-  // R = refract(eyeDirection,N,0.9f);
+  if(refractOn){
 
+	vec4 viewPos = vPosition;
+	vec3 eyeDirection = viewPos.xyz;
+
+	Normal.w = 0.0f;
+	vec4 viewN = model_matrix*Normal;
+	vec3 N = normalize(viewN.xyz);
+	R = refract(eyeDirection, N, 0.3f);
+	}
+
+  if(reflectOn)
+  {
+	vec4 viewPos = model_matrix*vPosition;
+	vec3 eyeDirection = viewPos.xyz;
+
+	Normal.w = 0.0f;
+	vec4 viewN = model_matrix*Normal;
+	vec3 N = normalize(viewN.xyz);
+	R = reflect(eyeDirection, N);
+  }
+
+
+
+  
 
   gl_Position = projection_matrix*model_matrix*vPosition;
 
