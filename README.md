@@ -1,3 +1,3 @@
 OpenGL
 ======
-about CS543 homework
+CS543 homework using openGL
